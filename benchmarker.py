@@ -1,5 +1,5 @@
 from time import time
-from os import remove
+from os import remove, path
 
 
 class Benchmarker:
@@ -13,6 +13,7 @@ class Benchmarker:
         summarizer=None,
         writer=None,
         progress_bar=None,
+        keep_dimacs=False
     ):
         self.preprocessors = preprocessors
         self.dimacs = dimacs
@@ -22,6 +23,7 @@ class Benchmarker:
         self.summarizer = summarizer
         self.writer = writer
         self.progress_bar = progress_bar
+        self.keep_dimacs = keep_dimacs
 
     def run(self):
         if self.progress_bar:
@@ -40,21 +42,23 @@ class Benchmarker:
                     for solver in self.solvers:
                         solver_name = solver.name
                         preprocessor_name = preprocessor.name
+                        target_path = "temp.dimacs" if not self.keep_dimacs else f'{preprocessor_name}-{path.basename(dimacs)}'
 
-                        preprocessor_start_time = time()
-                        factor = preprocessor.run(dimacs, "temp.dimacs", self.timeout)
+                        preprocessor_start_time = time()  
+                        factor = preprocessor.run(dimacs, target_path, self.timeout)
                         preprocessor_time = time() - preprocessor_start_time
 
                         solver_start_time = time()
                         number_of_solutions = solver.run(
-                            "temp.dimacs",
+                            target_path,
                             self.timeout - preprocessor_time
                             if self.timeout is not None
                             else None,
                         )
                         solver_time = time() - solver_start_time
 
-                        remove("temp.dimacs")
+                        if not self.keep_dimacs:
+                            remove(target_path)
 
                         factor_times_number = (
                             factor * number_of_solutions

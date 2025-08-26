@@ -1,4 +1,4 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, BooleanOptionalAction
 from os.path import isfile
 
 from progress.bar import Bar
@@ -80,6 +80,12 @@ def validate_arguments(args):
         print("Timeout {} must be greater than zero".format(args.timeout))
         exit(1)
 
+    if args.keep_dimacs:
+        keep_dimacs = True
+    else:
+        keep_dimacs = False
+    print(keep_dimacs)
+
     if args.output:
         file = open(args.output, "w", newline="")
         writer = ResultWriter(file, [])
@@ -93,6 +99,7 @@ def validate_arguments(args):
         args.number_of_executions,
         args.timeout,
         writer,
+        keep_dimacs
     )
 
 
@@ -110,6 +117,7 @@ if __name__ == "__main__":
     run.add_argument("-s", "--solver", nargs="+", required=True)
     run.add_argument("-d", "--dimacs", nargs="+", required=True)
     run.add_argument("-o", "--output")
+    run.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
 
     args = main.parse_args()
     if args.command == "solvers":
@@ -129,6 +137,7 @@ if __name__ == "__main__":
             number_of_executions,
             timeout,
             output_writer,
+            keep_dimacs
         ) = validate_arguments(args)
 
         progress_bar = Bar(
@@ -146,5 +155,6 @@ if __name__ == "__main__":
             summarizer,
             output_writer,
             progress_bar,
+            keep_dimacs
         )
         benchmarker.run()
