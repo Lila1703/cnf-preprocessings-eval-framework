@@ -109,6 +109,35 @@ class D4(ExecutableSolver):
         found = search("s (\\d+)", output)
         if found:
             return int(found.group(1))
+        
+class D4V2(ExecutableSolver):
+    """d4v2 d-DNNF compiler
+
+    See https://github.com/SoftVarE-Group/d4v2    
+    """
+
+    command_line = "solvers/d4v2 -i {input} -m ddnnf-compiler"
+    name = "d4v2"
+
+    def get_number_of_solutions(self, output):
+        found = search("s (\\d+)", output)
+        if found:
+            return int(found.group(1))
+    
+
+class PD4(ExecutableSolver):
+    """Projected compilation with d4v2
+    
+    See https://github.com/SoftVarE-Group/d4v2 
+    """
+
+    command_line = "solvers/d4v2 -i {input} -m proj-ddnnf-compiler"
+    name = "pd4"
+
+    def get_number_of_solutions(self, output):
+        found = search("s (\\d+)", output)
+        if found:
+            return int(found.group(1))
 
 
 class BddMiniSat(ExecutableSolver):
