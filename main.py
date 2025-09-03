@@ -84,7 +84,11 @@ def validate_arguments(args):
         keep_dimacs = True
     else:
         keep_dimacs = False
-    print(keep_dimacs)
+
+    if args.copy_comments:
+        copy_comments = True
+    else:
+        copy_comments = False
 
     if args.output:
         file = open(args.output, "w", newline="")
@@ -99,7 +103,8 @@ def validate_arguments(args):
         args.number_of_executions,
         args.timeout,
         writer,
-        keep_dimacs
+        keep_dimacs,
+        copy_comments
     )
 
 
@@ -118,6 +123,7 @@ if __name__ == "__main__":
     run.add_argument("-d", "--dimacs", nargs="+", required=True)
     run.add_argument("-o", "--output")
     run.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
+    run.add_argument("-c", "--copy_comments", action=BooleanOptionalAction)
 
     args = main.parse_args()
     if args.command == "solvers":
@@ -137,7 +143,8 @@ if __name__ == "__main__":
             number_of_executions,
             timeout,
             output_writer,
-            keep_dimacs
+            keep_dimacs,
+            copy_comments
         ) = validate_arguments(args)
 
         progress_bar = Bar(
@@ -155,6 +162,7 @@ if __name__ == "__main__":
             summarizer,
             output_writer,
             progress_bar,
-            keep_dimacs
+            keep_dimacs,
+            copy_comments
         )
         benchmarker.run()

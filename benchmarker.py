@@ -1,5 +1,6 @@
 from time import time
 from os import remove, path
+from util import get_comments_string, preprend_content, get_temp_dimacs_path
 
 
 class Benchmarker:
@@ -13,7 +14,8 @@ class Benchmarker:
         summarizer=None,
         writer=None,
         progress_bar=None,
-        keep_dimacs=False
+        keep_dimacs=False,
+        copy_comments=False
     ):
         self.preprocessors = preprocessors
         self.dimacs = dimacs
@@ -24,6 +26,7 @@ class Benchmarker:
         self.writer = writer
         self.progress_bar = progress_bar
         self.keep_dimacs = keep_dimacs
+        self.copy_comments = copy_comments
 
     def run(self):
         if self.progress_bar:
@@ -42,11 +45,14 @@ class Benchmarker:
                     for solver in self.solvers:
                         solver_name = solver.name
                         preprocessor_name = preprocessor.name
-                        target_path = "temp.dimacs" if not self.keep_dimacs else f'{preprocessor_name}-{path.basename(dimacs)}'
+                        target_path = get_temp_dimacs_path(dimacs, preprocessor.name, self.keep_dimacs)
 
                         preprocessor_start_time = time()  
                         factor = preprocessor.run(dimacs, target_path, self.timeout)
                         preprocessor_time = time() - preprocessor_start_time
+                        
+                        dimacs_comments = get_comments_string(dimacs)
+                        preprend_content(dimacs_comments, target_path)
 
                         solver_start_time = time()
                         number_of_solutions = solver.run(

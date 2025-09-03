@@ -33,7 +33,7 @@ class ExecutableSolver:
 
     def get_number_of_solutions(self, output):
         """Returns the number of solutions the solver found."""
-        ...
+        ...        
 
 
 class SharpSat(ExecutableSolver):

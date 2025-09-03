@@ -8,7 +8,7 @@ This file describes the preprocessors currently integrated in the framework.
 
 A unit clause is a clause $U$ that contains only a single literal $U = \{l\}$. Because all clauses must evaluate to true, this literal $l$ must be satisfied. The unit clause $U$ can therefore be removed from the clause list and all clauses where $l$ or $\bar{l}$ occur can be simplified (in the case of $\bar{l}$) or removed (in the case of $l$).
 
-### SAT# Behaviour
+### #SAT Behaviour
 
 Unit propagation results in a _logically equivalent_ formula and does therefore not change the number of solutions.
 
