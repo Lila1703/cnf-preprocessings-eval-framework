@@ -7,11 +7,34 @@ class ResultWriter:
         self.file = file
         self.writer = writer(file)
         self.write_headers = False
+        self.fieldnames = None
 
     def writeheader(self):
         self.write_headers = True
 
     def writerows(self, results):
+        # If benchmarker set `fieldnames`, write one CSV row per result dict
+        # using that order. This gives a simple table with one run per row and
+        # the exact fields specified by `benchmarker`.
+        if self.write_headers and self.fieldnames:
+            self.writer.writerow(self.fieldnames)
+            for run in results:
+                row = []
+                for f in self.fieldnames:
+                    v = run.get(f, "")
+                    if f == "solutions_preserved":
+                        if v is True:
+                            v = "yes"
+                        elif v is False:
+                            v = "no"
+                        else:
+                            v = "unknown"
+                    row.append(v)
+                self.writer.writerow(row)
+            return
+
+        # Fallback: original compact format (one row per DIMACS, columns are
+        # solver+preprocessor and cells contain semicolon-separated runtimes).
         if self.write_headers:
             headers = ["Model"]
             for ((solver, preprocessor), _) in groupby(

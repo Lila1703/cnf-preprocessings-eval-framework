@@ -162,6 +162,36 @@ class HyperBinaryResolution(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
 
+# Added by Linus
+class BoundedVariableElimination(ExecutablePreprocessor): 
+    """A preprocessnor that applies bounded variable elimination
+
+    For details about bounded variable elimination see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bce -no-ee -no-probe -bve -dimacs={target} {source}"
+    name = "BoundedVariableElimination"
+
+    def get_factor_of_number_of_solutions(self, output):
+        # found = search("(\\d+) bve-lits", output)
+        # if found:
+        #     return Fraction(1, 2 ** int(found.group(1)))
+        return 1
+    
+class VariableElimination(ExecutablePreprocessor):
+    """A preprocessnor that applies variable elimination
+
+    For details about variable elimination see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bce -no-ee -no-probe -ve -dimacs={target} {source}"
+    name = "VariableElimination"
+
+    def get_factor_of_number_of_solutions(self, output):
+        # found = search("(\\d+) ve-lits", output)
+        # if found:
+        #     return Fraction(1, 2 ** int(found.group(1)))
+        return 1
 
 class PreprocessorSequence(Preprocessor):
     """A preprocessor that applies multiple given preprocessors in order."""
