@@ -61,7 +61,7 @@ SharpSat    UnitPropagation                             0.00483203            1.
 The following options are supported:
 
 - `-s`/`--solver` with a list of solvers to benchmark
-- `-p`/`--preprocessor` with a list of preprocessors to benchmark (optional, default: only solvers are run)
+- `-p`/`--preprocessor` with a list of preprocessors to benchmark (optional, default: only solvers are run) (Sequences of preprocessings possible with "preprocessing1 preprocessing2")
 - `-d`/`--dimacs` with a list of files in DIMACS CNT format
 - `-n`/`--number-of-executions` with the number of times the benchmark should be repeated (optional, default: 1)
 - `-o`/`--output` with the file where the full results should be written to (optional, default: full results are discarded)
@@ -87,3 +87,32 @@ Solver      Preprocessor      Avg. preprocessor time    Avg. solver time    Avg.
 CountAntom  NoPreprocessor                0.00132699            0.400248           0.401575               1                    100
 SharpSat    NoPreprocessor                0.00140333            1.60714            1.60854                1                    100
 ```
+
+### Checking equivalence or model-counts (`check`)
+
+This framework provides a `check` command to verify whether a preprocessor
+preserves logical equivalence or preserves the model count.
+
+Examples:
+
+- Run an equivalence check (SAT-based) using the default SAT solver:
+```
+./bin/python main.py check -p UnitPropagation -d test/mbx.dimacs
+```
+
+- Run a counting-based check using the default counter (`SharpSat`):
+```
+./bin/python main.py check -p UnitPropagation -d test/mbx.dimacs --count-check
+```
+
+
+Meaning of outputs:
+- `PASS` — The check succeeded (no counterexample found for equivalence, or counts match).
+- `FAIL` — A counterexample was found (or counts do not match).
+- `UNKNOWN` — A timeout or unclear solver output prevented a definite answer.
+
+Notes and flags:
+- `-p`/`--preprocessor` : name of the preprocessor (or a quoted sequence to create a pipeline). Must be provided for `check`.
+- `--count-check` : run a model-count comparison (uses the solver class named by `--counter`).
+- `--counter` : name of the counting solver to use (default: `SharpSat`). The name must match a solver class in `solver.py`.
+- `-t`/`--timeout` : timeout in seconds for solver/preprocessor runs.

@@ -8,6 +8,9 @@ from preprocessor import ExecutablePreprocessor, NoPreprocessor, PreprocessorSeq
 from benchmarker import Benchmarker
 from summarizer import Summarizer
 from writer import ResultWriter
+from util import get_temp_dimacs_path, get_comments_string, preprend_content
+import os
+from equivalence_check import build_diff_cnf, run_sat_solver
 
 
 def find_subclass_by_name(name, classes):
@@ -125,6 +128,16 @@ if __name__ == "__main__":
     run.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
     run.add_argument("-c", "--copy_comments", action=BooleanOptionalAction)
 
+    check = subparsers.add_parser("check")
+    check.add_argument("-p", "--preprocessor", nargs="+", default=[])
+    check.add_argument("-t", "--timeout", type=float)
+    check.add_argument("-d", "--dimacs", nargs="+", required=True)
+    check.add_argument("-S", "--sat-solver", default="./solvers/MiniSat_v1.14_linux {input}")
+    check.add_argument("--count-check", action="store_true", help="Run a model-count check instead of the SAT equivalence check")
+    check.add_argument("--counter", default="SharpSat", help="Name of counting solver class to use (e.g. D4V2, SharpSat)")
+    check.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
+    check.add_argument("-c", "--copy_comments", action=BooleanOptionalAction)
+
     args = main.parse_args()
     if args.command == "solvers":
         print("The following solvers are registered:")
@@ -166,3 +179,140 @@ if __name__ == "__main__":
             copy_comments
         )
         benchmarker.run()
+
+    if args.command == "check":
+
+        # validate preprocessors
+        preprocessors = []
+        for p in args.preprocessor:
+            preprocessor = find_preprocessors_by_names(p)
+            if preprocessor is None:
+                print("Preprocessor '{}' is not registered".format(p))
+                exit(1)
+            preprocessors.append(preprocessor)
+
+        # Do not add NoPreprocessor here — comparing the original to itself is pointless.
+        if not preprocessors:
+            print("No preprocessors specified; nothing to check. Use -p to list preprocessors.")
+            exit(0)
+
+        for d in args.dimacs:
+            if not isfile(d):
+                print("File '{}' doesn't exist".format(d))
+                exit(1)
+
+        if args.timeout and args.timeout <= 0:
+            print("Timeout {} must be greater than zero".format(args.timeout))
+            exit(1)
+
+        keep_dimacs = True if args.keep_dimacs else False
+        copy_comments = True if args.copy_comments else False
+
+        sat_solver = args.sat_solver
+        do_count_check = args.count_check
+        counter_name = args.counter
+        # If default MiniSat binary is present but not executable, try to fix permissions
+        try:
+            solver_first_token = sat_solver.split()[0]
+            if solver_first_token.startswith('./solvers'):
+                solver_path = solver_first_token
+                if os.path.exists(solver_path):
+                    if not os.access(solver_path, os.X_OK):
+                        try:
+                            os.chmod(solver_path, 0o755)
+                            print(f"Made solver executable: {solver_path}")
+                        except Exception:
+                            print(f"Solver found but could not make executable: {solver_path}")
+                else:
+                    print(f"Warning: solver binary not found at {solver_path}. Please place your solver binary there or pass -S with the correct path.")
+        except Exception:
+            pass
+
+        # For each dimacs and preprocessor produce a PASS/FAIL
+        for dimacs in args.dimacs:
+            for preprocessor in preprocessors:
+                preprocessor_name = preprocessor.name
+                target_path = get_temp_dimacs_path(dimacs, preprocessor.name, keep_dimacs)
+
+                # run preprocessor
+                factor = preprocessor.run(dimacs, target_path, args.timeout)
+
+                if copy_comments:
+                    comments = get_comments_string(dimacs)
+                    preprend_content(comments, target_path)
+
+                # If requested, run a counting-based check: compare model counts
+                if do_count_check:
+                    counter_cls = find_solver_by_name(counter_name)
+                    if counter_cls is None:
+                        print(f"Counter solver '{counter_name}' is not registered. Available solvers: {', '.join(names_of_subclasses(ExecutableSolver))}")
+                        if not keep_dimacs and os.path.exists(target_path):
+                            try:
+                                os.remove(target_path)
+                            except Exception:
+                                pass
+                        exit(1)
+
+                    counter = counter_cls()
+                    orig_count = counter.run(dimacs, args.timeout)
+                    pre_count = counter.run(target_path, args.timeout)
+
+                    status = 'UNKNOWN'
+                    try:
+                        from fractions import Fraction
+
+                        if orig_count is None or pre_count is None:
+                            status = 'UNKNOWN'
+                        elif factor is None:
+                            status = 'PASS' if orig_count == pre_count else 'FAIL'
+                        else:
+                            expected = Fraction(pre_count) * Fraction(factor)
+                            if expected.denominator == 1:
+                                status = 'PASS' if orig_count == expected.numerator else 'FAIL'
+                            else:
+                                status = 'FAIL'
+                    except Exception:
+                        status = 'UNKNOWN'
+
+                    if not keep_dimacs and os.path.exists(target_path):
+                        try:
+                            os.remove(target_path)
+                        except Exception:
+                            pass
+
+                    print(f"{preprocessor_name} on {dimacs}: {status} (count-check using {counter_name})")
+                    continue
+
+                # build difference CNFs and run SAT checks
+                base = os.path.splitext(os.path.basename(dimacs))[0]
+                check1 = f"temp.check.{preprocessor_name}.{base}.1.dimacs"
+                check2 = f"temp.check.{preprocessor_name}.{base}.2.dimacs"
+
+                build_diff_cnf(dimacs, target_path, check1, mode='F_and_not_G')
+                sat1 = run_sat_solver(sat_solver, check1, timeout=args.timeout)
+
+                build_diff_cnf(dimacs, target_path, check2, mode='G_and_not_F')
+                sat2 = run_sat_solver(sat_solver, check2, timeout=args.timeout)
+
+                # cleanup
+                if not keep_dimacs and os.path.exists(target_path):
+                    try:
+                        os.remove(target_path)
+                    except Exception:
+                        pass
+                for f in (check1, check2):
+                    if os.path.exists(f):
+                        try:
+                            os.remove(f)
+                        except Exception:
+                            pass
+
+                status = None
+                if sat1 is None or sat2 is None:
+                    status = 'UNKNOWN'
+                elif sat1 or sat2:
+                    status = 'FAIL'
+                else:
+                    status = 'PASS'
+
+                print(f"{preprocessor_name} on {dimacs}: {status}")
