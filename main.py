@@ -120,6 +120,7 @@ if __name__ == "__main__":
 
     run = subparsers.add_parser("run")
     run.add_argument("-n", "--number-of-executions", default=1, type=int)
+    run.add_argument("-a", "--accumulate", action="store_true", help="Run each preprocessor repeated 1..n times (accumulate)")
     run.add_argument("-p", "--preprocessor", nargs="+", default=[])
     run.add_argument("-t", "--timeout", type=float)
     run.add_argument("-s", "--solver", nargs="+", required=True)
@@ -157,8 +158,35 @@ if __name__ == "__main__":
             timeout,
             output_writer,
             keep_dimacs,
-            copy_comments
+            copy_comments,
         ) = validate_arguments(args)
+
+        # If accumulate is requested, expand each preprocessor into sequences
+        # applied 1..n times. Keep NoPreprocessor as a single baseline entry.
+        if getattr(args, "accumulate", False):
+            expanded = []
+            max_k = args.number_of_executions
+            for pre in preprocessors:
+                # Don't expand the NoPreprocessor baseline
+                if isinstance(pre, NoPreprocessor):
+                    expanded.append(pre)
+                    continue
+
+                # Determine base sequence (single preprocessor or existing sequence)
+                if isinstance(pre, PreprocessorSequence):
+                    base = pre.preprocessors
+                else:
+                    base = [pre]
+
+                for k in range(1, max_k + 1):
+                    seq = []
+                    for _ in range(k):
+                        seq.extend(base)
+                    expanded.append(PreprocessorSequence(seq))
+
+            preprocessors = expanded
+            # After expansion, we don't want to repeat the whole benchmark multiple times
+            number_of_executions = 1
 
         progress_bar = Bar(
             "Benchmarking", width=50, suffix="%(index)d/%(max)d - ETA: %(eta)ds"

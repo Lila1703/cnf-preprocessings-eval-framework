@@ -1,6 +1,6 @@
 from time import time
 from os import remove, path
-from util import get_comments_string, preprend_content, get_temp_dimacs_path
+from util import get_comments_string, preprend_content, get_temp_dimacs_path, fix_pcnf_header_to_original
 
 
 class Benchmarker:
@@ -63,6 +63,11 @@ class Benchmarker:
                         # Some preprocessors may time out and not write `target_path`.
                         if path.isfile(target_path):
                             preprend_content(dimacs_comments, target_path)
+                            # Ensure the p cnf header uses the original variable count
+                            try:
+                                fix_pcnf_header_to_original(dimacs, target_path)
+                            except Exception:
+                                pass
 
                         solver_start_time = time()
                         # Use the preprocessed file if it exists, otherwise fall back to original DIMACS.

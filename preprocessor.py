@@ -3,6 +3,9 @@ from re import search
 from shlex import split
 from fractions import Fraction
 from time import time
+import os
+from uuid import uuid4
+from shutil import move
 
 
 class Preprocessor:
@@ -210,23 +213,70 @@ class PreprocessorSequence(Preprocessor):
 
     def run(self, source, target, timeout=None):
         factor = 1
-        for (i, preprocessor) in enumerate(self.preprocessors):
-            start = time()
-            if i == 0:
-                step_factor = preprocessor.run(source, target, timeout)
-            else:
-                step_factor = preprocessor.run(target, target, timeout)
+        # Use a unique temporary base to avoid clashes with other runs.
+        unique = uuid4().hex
+        temp_files = []
+        current_source = source
+        try:
+            for i, preprocessor in enumerate(self.preprocessors):
+                start = time()
+                # determine intermediate path; last step writes to a temp file
+                # and we rename it to `target` atomically at the end to avoid
+                # exposing partially-written files.
+                if i == len(self.preprocessors) - 1:
+                    out_path = f"{target}.{unique}.final"
+                else:
+                    out_path = f"{target}.{unique}.step{i}"
 
-            # If the step timed out or failed to provide a factor, stop here
-            # and propagate None. Benchmarker will fall back to original DIMACS
-            # if the target file wasn't produced.
-            if step_factor is None:
-                return None
+                step_factor = preprocessor.run(current_source, out_path, timeout)
 
-            factor *= step_factor
-            length = time() - start
-            if timeout:
-                timeout = timeout - length
-                if timeout <= 0:
+                if step_factor is None:
+                    # On failure, ensure we don't leave partial final file
+                    try:
+                        if os.path.exists(out_path):
+                            os.remove(out_path)
+                    except Exception:
+                        pass
                     return None
-        return factor
+
+                factor *= step_factor
+                length = time() - start
+                if timeout:
+                    timeout = timeout - length
+                    if timeout <= 0:
+                        return None
+
+                temp_files.append(out_path)
+                current_source = out_path
+
+            # Move the final temporary file to the requested target atomically
+            final_temp = temp_files[-1] if temp_files else None
+            if final_temp and os.path.exists(final_temp):
+                try:
+                    # ensure target dir exists
+                    targ_dir = os.path.dirname(target)
+                    if targ_dir and not os.path.exists(targ_dir):
+                        os.makedirs(targ_dir, exist_ok=True)
+                    os.replace(final_temp, target)
+                except Exception:
+                    # fallback to move
+                    try:
+                        move(final_temp, target)
+                    except Exception:
+                        pass
+
+            return factor
+        finally:
+            # Cleanup any leftover intermediate files (excluding the final target)
+            try:
+                for f in temp_files:
+                    if f and os.path.exists(f):
+                        # do not remove the final target (we moved it)
+                        if os.path.abspath(f) == os.path.abspath(target):
+                            continue
+                        try:
+                            os.remove(f)
+                        except Exception:
+                            pass
+            except Exception:
+                pass
