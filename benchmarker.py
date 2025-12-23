@@ -50,25 +50,32 @@ class Benchmarker:
                     for solver in self.solvers:
                         solver_name = solver.name
                         preprocessor_name = preprocessor.name
-                        target_path = get_temp_dimacs_path(dimacs, preprocessor.name, self.keep_dimacs)
+                        target_path = get_temp_dimacs_path(
+                            dimacs, preprocessor.name, self.keep_dimacs)
 
                         preprocessor_start_time = time()
-                        factor = preprocessor.run(dimacs, target_path, self.timeout)
+                        factor = preprocessor.run(
+                            dimacs, target_path, self.timeout)
                         preprocessor_time = time() - preprocessor_start_time
 
                         dimacs_comments = get_comments_string(dimacs)
-                        preprend_content(dimacs_comments, target_path)
+                        # If preprocessing produced a target file, prepend original comments.
+                        # Some preprocessors may time out and not write `target_path`.
+                        if path.isfile(target_path):
+                            preprend_content(dimacs_comments, target_path)
 
                         solver_start_time = time()
+                        # Use the preprocessed file if it exists, otherwise fall back to original DIMACS.
+                        solver_input_path = target_path if path.isfile(target_path) else dimacs
                         number_of_solutions = solver.run(
-                            target_path,
+                            solver_input_path,
                             self.timeout - preprocessor_time
                             if self.timeout is not None
                             else None,
                         )
                         solver_time = time() - solver_start_time
 
-                        if not self.keep_dimacs:
+                        if not self.keep_dimacs and path.isfile(target_path):
                             remove(target_path)
 
                         factor_times_number = (
@@ -101,7 +108,8 @@ class Benchmarker:
                 original_counts = {}
                 for r in local_results:
                     if r["preprocessor_name"] == "NoPreprocessor":
-                        original_counts[r["solver_name"]] = r["number_of_solutions"]
+                        original_counts[r["solver_name"]
+                                        ] = r["number_of_solutions"]
 
                 # Update solutions_preserved for all local results
                 for r in local_results:
@@ -122,15 +130,15 @@ class Benchmarker:
 
         if self.writer:
             self.writer.fieldnames = [
-                "solver_name",
-                "preprocessor_name",
                 "dimacs",
+                "preprocessor_name",
+                "solver_name",
                 "preprocessor_time",
                 "solver_time",
                 "total_time",
                 "factor",
                 "number_of_solutions",
-                #"factor_times_number",
+                # "factor_times_number",
                 "solutions_preserved",
             ]
             self.writer.writeheader()

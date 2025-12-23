@@ -29,7 +29,7 @@ def _read_dimacs_clauses(file_path):
 
 
 def build_diff_cnf(f_path, g_path, out_path, mode='F_and_not_G'):
-    """Build a CNF file that is satisfiable iff:
+    """Build a CNF file that is satisfiable if:
     - mode == 'F_and_not_G': there exists assignment with F true and G false
     - mode == 'G_and_not_F': there exists assignment with G true and F false
 

@@ -17,6 +17,8 @@ class ResultWriter:
         # using that order. This gives a simple table with one run per row and
         # the exact fields specified by `benchmarker`.
         if self.write_headers and self.fieldnames:
+            # Sort by dimacs, then preprocessor, then solver
+            results = sorted(results, key=lambda x: (x.get("dimacs", ""), x.get("preprocessor_name", ""), x.get("solver_name", "")))
             self.writer.writerow(self.fieldnames)
             for run in results:
                 row = []

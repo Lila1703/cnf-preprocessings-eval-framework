@@ -32,7 +32,13 @@ class ExecutablePreprocessor(Preprocessor):
             output = check_output(command, stderr=STDOUT, timeout=timeout)
         except CalledProcessError as e:
             output = e.output
-        except TimeoutExpired as e:
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            # Executable couldn't be started (bad format, missing interpreter,
+            # wrong architecture, or missing file). Return None to signal a
+            # failure so callers can fall back to the original DIMACS.
+            print(f"Preprocessor execution failed: {e}")
             return None
         return self.get_factor_of_number_of_solutions(str(output))
 
@@ -207,9 +213,17 @@ class PreprocessorSequence(Preprocessor):
         for (i, preprocessor) in enumerate(self.preprocessors):
             start = time()
             if i == 0:
-                factor *= preprocessor.run(source, target, timeout)
+                step_factor = preprocessor.run(source, target, timeout)
             else:
-                factor *= preprocessor.run(target, target, timeout)
+                step_factor = preprocessor.run(target, target, timeout)
+
+            # If the step timed out or failed to provide a factor, stop here
+            # and propagate None. Benchmarker will fall back to original DIMACS
+            # if the target file wasn't produced.
+            if step_factor is None:
+                return None
+
+            factor *= step_factor
             length = time() - start
             if timeout:
                 timeout = timeout - length

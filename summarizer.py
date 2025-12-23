@@ -1,4 +1,5 @@
 from tabulate import tabulate
+from csv import writer
 
 from itertools import groupby
 from preprocessor import NoPreprocessor
@@ -14,6 +15,17 @@ def all_equal(iterator):
 
 
 class Summarizer:
+    def __init__(self, summary_csv_file=None):
+        self.summary_csv_file = summary_csv_file
+        self.csv_writer = None
+        self.csv_file = None
+        if summary_csv_file:
+            try:
+                self.csv_file = open(summary_csv_file, "w", newline="")
+                self.csv_writer = writer(self.csv_file)
+            except Exception as e:
+                print(f"Warning: Could not open summary CSV file '{summary_csv_file}': {e}")
+
     def groupby_solver_preprocessor(self, results):
         results.sort(key=lambda x: (x["solver_name"], x["preprocessor_name"]))
         return groupby(
@@ -129,17 +141,26 @@ class Summarizer:
 
         table.sort(key=lambda x: str(x[4]))
 
+        headers = [
+            "Solver",
+            "Preprocessor",
+            "Avg. preprocessor time",
+            "Avg. solver time",
+            "Avg. total time",
+            "Avg. speedup",
+            "Percentage finished",
+        ]
+
         print(
             tabulate(
                 table,
-                headers=[
-                    "Solver",
-                    "Preprocessor",
-                    "Avg. preprocessor time",
-                    "Avg. solver time",
-                    "Avg. total time",
-                    "Avg. speedup",
-                    "Percentage finished",
-                ],
+                headers=headers,
             )
         )
+
+        # Write summary to CSV if requested
+        if self.csv_writer:
+            self.csv_writer.writerow(headers)
+            for row in table:
+                self.csv_writer.writerow(row)
+            self.csv_file.close()
