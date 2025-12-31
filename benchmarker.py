@@ -54,7 +54,8 @@ class Benchmarker:
                             dimacs, preprocessor.name, self.keep_dimacs)
 
                         preprocessor_start_time = time()
-                        factor = preprocessor.run(
+                        # Run preprocessor; legacy API returns a factor that we ignore.
+                        _ = preprocessor.run(
                             dimacs, target_path, self.timeout)
                         preprocessor_time = time() - preprocessor_start_time
 
@@ -64,10 +65,13 @@ class Benchmarker:
                         if path.isfile(target_path):
                             preprend_content(dimacs_comments, target_path)
                             # Ensure the p cnf header uses the original variable count
-                            try:
-                                fix_pcnf_header_to_original(dimacs, target_path)
-                            except Exception:
-                                pass
+                            # NOTE: Do NOT call this for SharpSatPreprocessor (or sequences containing it)
+                            # as it eliminates unused variables and the header must reflect the actual var count
+                            if "SharpSatPreprocessor" not in preprocessor_name and "EquivalentLiteralElimination" not in preprocessor_name:
+                                try:
+                                    fix_pcnf_header_to_original(dimacs, target_path)
+                                except Exception:
+                                    pass
 
                         solver_start_time = time()
                         # Use the preprocessed file if it exists, otherwise fall back to original DIMACS.
@@ -83,12 +87,6 @@ class Benchmarker:
                         if not self.keep_dimacs and path.isfile(target_path):
                             remove(target_path)
 
-                        factor_times_number = (
-                            factor * number_of_solutions
-                            if factor is not None and number_of_solutions is not None
-                            else None
-                        )
-
                         entry = {
                             "solver_name": solver_name,
                             "preprocessor_name": preprocessor_name,
@@ -96,9 +94,7 @@ class Benchmarker:
                             "preprocessor_time": preprocessor_time,
                             "solver_time": solver_time,
                             "total_time": preprocessor_time + solver_time,
-                            "factor": factor,
                             "number_of_solutions": number_of_solutions,
-                            "factor_times_number": factor_times_number,
                             "finished": number_of_solutions is not None,
                             # fill solutions_preserved later after we know NoPreprocessor
                             "solutions_preserved": None,
@@ -141,7 +137,6 @@ class Benchmarker:
                 "preprocessor_time",
                 "solver_time",
                 "total_time",
-                "factor",
                 "number_of_solutions",
                 # "factor_times_number",
                 "solutions_preserved",

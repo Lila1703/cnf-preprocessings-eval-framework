@@ -187,19 +187,133 @@ class BoundedVariableElimination(ExecutablePreprocessor):
         #     return Fraction(1, 2 ** int(found.group(1)))
         return 1
     
-class VariableElimination(ExecutablePreprocessor):
-    """A preprocessnor that applies variable elimination
+class BoundsConsistencyElimination(ExecutablePreprocessor):
+    """A preprocessor that applies bounded consistency elimination (BCE).
 
-    For details about variable elimination see preprocessors.md.
+    For details about BCE see preprocessors.md.
     """
 
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bce -no-ee -no-probe -ve -dimacs={target} {source}"
-    name = "VariableElimination"
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-ee -no-probe -bce -dimacs={target} {source}"
+    name = "BoundsConsistencyElimination"
 
     def get_factor_of_number_of_solutions(self, output):
-        # found = search("(\\d+) ve-lits", output)
-        # if found:
-        #     return Fraction(1, 2 ** int(found.group(1)))
+        return 1
+
+
+class XorReasoning(ExecutablePreprocessor):
+    """A preprocessor that applies XOR reasoning.
+
+    For details about XOR reasoning see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+    name = "XorReasoning"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class FourierMotzkin(ExecutablePreprocessor):
+    """A preprocessor that applies Fourier-Motzkin reasoning.
+
+    For details about Fourier-Motzkin reasoning see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+    name = "FourierMotzkin"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class DensePreprocessor(ExecutablePreprocessor):
+    """A preprocessor that applies dense preprocessing.
+
+    For details about dense preprocessing see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+    name = "DensePreprocessor"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class Simplification(ExecutablePreprocessor):
+    """A preprocessor that applies general simplification.
+
+    For details about simplification see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+    name = "Simplification"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class UnhidingPreprocessor(ExecutablePreprocessor):
+    """A preprocessor that applies unhiding.
+
+    For details about unhiding see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+    name = "UnhidingPreprocessor"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class StochasticLocalSearch(ExecutablePreprocessor):
+    """A preprocessor that applies stochastic local search.
+
+    For details about SLS see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -sls -dimacs={target} {source}"
+    name = "StochasticLocalSearch"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class SymmetryDetection(ExecutablePreprocessor):
+    """A preprocessor that applies symmetry detection and breaking.
+
+    For details about symmetry detection see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -symm -dimacs={target} {source}"
+    name = "SymmetryDetection"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class RewritingPreprocessor(ExecutablePreprocessor):
+    """A preprocessor that applies rewriting.
+
+    For details about rewriting see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -rew -dimacs={target} {source}"
+    name = "RewritingPreprocessor"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class BoundedVariableAddition(ExecutablePreprocessor):
+    """A preprocessor that applies bounded variable addition (BVA).
+
+    For details about BVA see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -bva -dimacs={target} {source}"
+    name = "BoundedVariableAddition"
+
+    def get_factor_of_number_of_solutions(self, output):
         return 1
 
 class PreprocessorSequence(Preprocessor):

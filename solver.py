@@ -48,7 +48,7 @@ class SharpSat(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("# solutions \\\\n(\\d+)\\\\n# END", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
 
 
 class SharpSatWithoutBuiltinPreprocessor(ExecutableSolver):
@@ -63,7 +63,7 @@ class SharpSatWithoutBuiltinPreprocessor(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("# solutions \\\\n(\\d+)\\\\n# END", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
 
 
 class DSharp(ExecutableSolver):
@@ -78,7 +78,7 @@ class DSharp(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("#SAT \\(full\\):   \\\\t\\\\t(\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
 
 
 class CountAntom(ExecutableSolver):
@@ -93,7 +93,7 @@ class CountAntom(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("c model count\\.*: (\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
 
 
 class D4(ExecutableSolver):
@@ -108,7 +108,7 @@ class D4(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("s (\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
         
 class D4V2(ExecutableSolver):
     """d4v2 d-DNNF compiler
@@ -122,7 +122,7 @@ class D4V2(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("s (\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
     
 
 class PD4(ExecutableSolver):
@@ -137,7 +137,7 @@ class PD4(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("s (\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
 
 
 class BddMiniSat(ExecutableSolver):
@@ -152,7 +152,7 @@ class BddMiniSat(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("SAT \\(full\\)\\s+:\\s+(\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
 
 
 class Ganak(ExecutableSolver):
@@ -167,7 +167,7 @@ class Ganak(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("s mc (\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
 
 
 class RelSat(ExecutableSolver):
@@ -182,7 +182,7 @@ class RelSat(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("Number of solutions: (\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)
 
 
 class C2D(ExecutableSolver):
@@ -197,4 +197,4 @@ class C2D(ExecutableSolver):
     def get_number_of_solutions(self, output):
         found = search("Counting...(\\d+)", output)
         if found:
-            return int(found.group(1))
+            return found.group(1)

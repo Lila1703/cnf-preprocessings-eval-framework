@@ -72,16 +72,15 @@ class Summarizer:
                     )
                 )
                 if len(no_preprocessor_runs) > 0:
-                    no_preprocessor_number_of_solutions = no_preprocessor_runs[0][
-                        "number_of_solutions"
-                    ]
+                    no_preprocessor_number_of_solutions = no_preprocessor_runs[0]["number_of_solutions"]
                     preprocessor_runs = filter(
                         lambda x: x["preprocessor_name"] != NoPreprocessor.name, runs
                     )
                     for preprocessor_run in preprocessor_runs:
                         if (
-                            preprocessor_run["factor_times_number"] is not None
-                            and preprocessor_run["factor_times_number"]
+                            preprocessor_run["number_of_solutions"] is not None
+                            and no_preprocessor_number_of_solutions is not None
+                            and preprocessor_run["number_of_solutions"]
                             != no_preprocessor_number_of_solutions
                         ):
                             reports.append(
