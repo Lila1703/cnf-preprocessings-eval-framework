@@ -7,14 +7,12 @@ import os
 from uuid import uuid4
 from shutil import move
 
-
 class Preprocessor:
     def run(self, source, target, timeout=None):
         """Runs this preprocessor on the file `source` producing the file `target`.
         Returns the factor by which the number of solutions is expected to differ
         or `None` if this factor cannot be determined."""
         ...
-
 
 class ExecutablePreprocessor(Preprocessor):
     """Base class for all executable preprocessors.
@@ -331,6 +329,20 @@ class PreprocessorSequence(Preprocessor):
         unique = uuid4().hex
         temp_files = []
         current_source = source
+        
+        # Get original variable count for header adjustment
+        original_var_count = None
+        try:
+            with open(source, 'r') as f:
+                for line in f:
+                    if line.startswith('p'):
+                        parts = line.split()
+                        if len(parts) >= 3:
+                            original_var_count = int(parts[2])
+                        break
+        except Exception:
+            pass
+        
         try:
             for i, preprocessor in enumerate(self.preprocessors):
                 start = time()
@@ -342,7 +354,16 @@ class PreprocessorSequence(Preprocessor):
                 else:
                     out_path = f"{target}.{unique}.step{i}"
 
-                step_factor = preprocessor.run(current_source, out_path, timeout)
+                # If this is SharpSatPreprocessor, adjust the header to use original var count
+                # This helps SharpSat process preprocessed files consistently
+                preprocessor_input = current_source
+                if preprocessor.name == "SharpSatPreprocessor" and current_source != source and original_var_count:
+                    adjusted_path = f"{target}.{unique}.adjusted"
+                    if _set_header_to_max_var(current_source, adjusted_path, original_var_count):
+                        temp_files.append(adjusted_path)
+                        preprocessor_input = adjusted_path
+
+                step_factor = preprocessor.run(preprocessor_input, out_path, timeout)
 
                 if step_factor is None:
                     # On failure, ensure we don't leave partial final file
@@ -394,3 +415,107 @@ class PreprocessorSequence(Preprocessor):
                             pass
             except Exception:
                 pass
+
+def _set_header_to_max_var(input_file, output_file, target_var_count=None):
+    """Set the header to use target_var_count (or max var if not specified).
+    This helps SharpSat process preprocessed files consistently.
+    """
+    try:
+        comments = []
+        clauses = []
+        max_var = 0
+        
+        # Read file
+        with open(input_file, 'r') as f:
+            for line in f:
+                if line.startswith('c'):
+                    comments.append(line)
+                elif line.startswith('p'):
+                    continue
+                elif line.strip():
+                    clauses.append(line)
+                    literals = [int(x) for x in line.split()]
+                    for lit in literals:
+                        if lit != 0:
+                            max_var = max(max_var, abs(lit))
+        
+        # Use target_var_count if provided, otherwise use max_var
+        header_vars = target_var_count if target_var_count else max_var
+        
+        # Write output with adjusted header
+        with open(output_file, 'w') as f:
+            # Write comments
+            for comment in comments:
+                f.write(comment)
+            
+            # Write new header
+            f.write(f"p cnf {header_vars} {len(clauses)}\n")
+            
+            # Write clauses as-is
+            for clause in clauses:
+                f.write(clause)
+        
+        return True
+    except Exception:
+        return False
+
+
+def _renumber_variables_in_dimacs(input_file, output_file):
+    """Renumber variables in a DIMACS file to be 1, 2, 3, ..., N.
+    This ensures all variables are contiguous and properly ordered.
+    Returns True on success, False on failure.
+    """
+    try:
+        var_map = {}
+        next_id = 1
+        max_var = 0
+        clauses = []
+        comments = []
+        
+        # First pass: scan file to build variable mapping
+        with open(input_file, 'r') as f:
+            for line in f:
+                if line.startswith('c'):
+                    comments.append(line)
+                elif line.startswith('p'):
+                    continue
+                elif line.strip():
+                    literals = [int(x) for x in line.split()]
+                    for lit in literals:
+                        if lit == 0:
+                            continue
+                        abs_var = abs(lit)
+                        if abs_var not in var_map:
+                            var_map[abs_var] = next_id
+                            next_id += 1
+                        max_var = max(max_var, abs_var)
+                    clauses.append(line)
+        
+        # Write output with renumbered variables
+        with open(output_file, 'w') as f:
+            # Write comments
+            for comment in comments:
+                f.write(comment)
+            
+            # Write new header
+            num_vars = len(var_map)
+            num_clauses = len(clauses)
+            f.write(f"p cnf {num_vars} {num_clauses}\n")
+            
+            # Write renumbered clauses
+            for clause_line in clauses:
+                literals = [int(x) for x in clause_line.split()]
+                new_literals = []
+                for lit in literals:
+                    if lit == 0:
+                        new_literals.append('0')
+                    else:
+                        sign = 1 if lit > 0 else -1
+                        new_lit = sign * var_map[abs(lit)]
+                        new_literals.append(str(new_lit))
+                
+                f.write(' '.join(new_literals) + '\n')
+        
+        return True
+    except Exception:
+        return False            
