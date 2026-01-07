@@ -126,6 +126,7 @@ if __name__ == "__main__":
     run.add_argument("-s", "--solver", nargs="+", required=True)
     run.add_argument("-d", "--dimacs", nargs="+", required=True)
     run.add_argument("-o", "--output")
+    run.add_argument("-sum", "--summary", help="Path to output summary CSV file (default: summary.csv)", nargs="?", const="summary.csv")
     run.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
     run.add_argument("-c", "--copy_comments", action=BooleanOptionalAction)
 
@@ -192,7 +193,7 @@ if __name__ == "__main__":
             "Benchmarking", width=50, suffix="%(index)d/%(max)d - ETA: %(eta)ds"
         )
 
-        summarizer = Summarizer()
+        summarizer = Summarizer(summary_csv_file=args.summary)
 
         benchmarker = Benchmarker(
             preprocessors,

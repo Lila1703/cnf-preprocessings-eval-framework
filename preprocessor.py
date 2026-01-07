@@ -180,9 +180,6 @@ class BoundedVariableElimination(ExecutablePreprocessor):
     name = "BoundedVariableElimination"
 
     def get_factor_of_number_of_solutions(self, output):
-        # found = search("(\\d+) bve-lits", output)
-        # if found:
-        #     return Fraction(1, 2 ** int(found.group(1)))
         return 1
     
 class BoundsConsistencyElimination(ExecutablePreprocessor):
@@ -263,19 +260,6 @@ class UnhidingPreprocessor(ExecutablePreprocessor):
         return 1
 
 
-class StochasticLocalSearch(ExecutablePreprocessor):
-    """A preprocessor that applies stochastic local search.
-
-    For details about SLS see preprocessors.md.
-    """
-
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -sls -dimacs={target} {source}"
-    name = "StochasticLocalSearch"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
 class SymmetryDetection(ExecutablePreprocessor):
     """A preprocessor that applies symmetry detection and breaking.
 
@@ -288,20 +272,6 @@ class SymmetryDetection(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
 
-
-class RewritingPreprocessor(ExecutablePreprocessor):
-    """A preprocessor that applies rewriting.
-
-    For details about rewriting see preprocessors.md.
-    """
-
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -rew -dimacs={target} {source}"
-    name = "RewritingPreprocessor"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
 class BoundedVariableAddition(ExecutablePreprocessor):
     """A preprocessor that applies bounded variable addition (BVA).
 
@@ -310,6 +280,130 @@ class BoundedVariableAddition(ExecutablePreprocessor):
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -bva -dimacs={target} {source}"
     name = "BoundedVariableAddition"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class CoveredClauseElimination(ExecutablePreprocessor):
+    """A preprocessor that applies covered clause elimination (CCE).
+
+
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -cce -dimacs={target} {source}"
+    name = "CoveredClauseElimination"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class ShufflePreprocessor(ExecutablePreprocessor):
+    """A preprocessor that shuffles the formula before preprocessing.
+
+    For details about shuffling see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -shuffle -dimacs={target} {source}"
+    name = "ShufflePreprocessor"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class TernaryClauseResolution(ExecutablePreprocessor):
+    """A preprocessor that applies ternary clause resolution.
+
+    For details about ternary clause resolution see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -3resolve -dimacs={target} {source}"
+    name = "TernaryClauseResolution"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class ResolutionAsymmetricTautologyElimination(ExecutablePreprocessor):
+    """A preprocessor that applies resolution asymmetric tautology elimination (RATE).
+
+    For details about RATE see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -rate -dimacs={target} {source}"
+    name = "ResolutionAsymmetricTautologyElimination"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class LiteralAddition(ExecutablePreprocessor):
+    """A preprocessor that applies literal addition (LA).
+
+    For details about literal addition see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -la -dimacs={target} {source}"
+    name = "LiteralAddition"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class ExperimentalSimplification(ExecutablePreprocessor):
+    """A preprocessor that applies experimental simplification techniques.
+
+    For details about experimental simplification see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -exp -dimacs={target} {source}"
+    name = "ExperimentalSimplification"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class EntailedRedundancyCheck(ExecutablePreprocessor):
+    """A preprocessor that checks for entailed redundancy during preprocessing.
+
+    For details about entailed redundancy checking see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -ent -dimacs={target} {source}"
+    name = "EntailedRedundancyCheck"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class ModularityBasedPreprocessing(ExecutablePreprocessor):
+    """A preprocessor that applies modularity-based preprocessing.
+
+    For details about modularity-based preprocessing see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -modprep -dimacs={target} {source}"
+    name = "ModularityBasedPreprocessing"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class TestCoprocessor(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -dimacs={target} {source}"
+    name = "TestCoprocessor"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class DefaultCoprocessor(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-dense -no-unhide -no-bve -no-bce -no-ee -dimacs={target} {source}"
+    name = "DefaultCoprocessor"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -458,64 +552,4 @@ def _set_header_to_max_var(input_file, output_file, target_var_count=None):
         return True
     except Exception:
         return False
-
-
-def _renumber_variables_in_dimacs(input_file, output_file):
-    """Renumber variables in a DIMACS file to be 1, 2, 3, ..., N.
-    This ensures all variables are contiguous and properly ordered.
-    Returns True on success, False on failure.
-    """
-    try:
-        var_map = {}
-        next_id = 1
-        max_var = 0
-        clauses = []
-        comments = []
-        
-        # First pass: scan file to build variable mapping
-        with open(input_file, 'r') as f:
-            for line in f:
-                if line.startswith('c'):
-                    comments.append(line)
-                elif line.startswith('p'):
-                    continue
-                elif line.strip():
-                    literals = [int(x) for x in line.split()]
-                    for lit in literals:
-                        if lit == 0:
-                            continue
-                        abs_var = abs(lit)
-                        if abs_var not in var_map:
-                            var_map[abs_var] = next_id
-                            next_id += 1
-                        max_var = max(max_var, abs_var)
-                    clauses.append(line)
-        
-        # Write output with renumbered variables
-        with open(output_file, 'w') as f:
-            # Write comments
-            for comment in comments:
-                f.write(comment)
-            
-            # Write new header
-            num_vars = len(var_map)
-            num_clauses = len(clauses)
-            f.write(f"p cnf {num_vars} {num_clauses}\n")
-            
-            # Write renumbered clauses
-            for clause_line in clauses:
-                literals = [int(x) for x in clause_line.split()]
-                new_literals = []
-                for lit in literals:
-                    if lit == 0:
-                        new_literals.append('0')
-                    else:
-                        sign = 1 if lit > 0 else -1
-                        new_lit = sign * var_map[abs(lit)]
-                        new_literals.append(str(new_lit))
-                
-                f.write(' '.join(new_literals) + '\n')
-        
-        return True
-    except Exception:
-        return False            
+         

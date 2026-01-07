@@ -114,10 +114,20 @@ class Summarizer:
                 avg_time_total = avg_time_preprocessor + avg_time_solver
                 if preprocessor == NoPreprocessor().name:
                     no_preprocessor_results[solver] = avg_time_total
+                
+                # Determine solutions_preserved status
+                solutions_preserved_values = [x.get("solutions_preserved", "unknown") for x in finished_data]
+                if all(v != "no" for v in solutions_preserved_values):
+                    solutions_preserved = "yes"
+                elif all(v != "yes" for v in solutions_preserved_values):
+                    solutions_preserved = "no"
+                else:
+                    solutions_preserved = "partly"
             else:
                 avg_time_preprocessor = "No run finished"
                 avg_time_solver = "No run finished"
                 avg_time_total = "No run finished"
+                solutions_preserved = "No data"
 
             percentage_finished = len(finished_data) * 100 / len(data)
             table.append(
@@ -129,6 +139,7 @@ class Summarizer:
                     avg_time_total,
                     0.0,
                     percentage_finished,
+                    solutions_preserved,
                 ]
             )
 
@@ -148,6 +159,7 @@ class Summarizer:
             "Avg. total time",
             "Avg. speedup",
             "Percentage finished",
+            "Solutions preserved",
         ]
 
         print(
