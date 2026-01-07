@@ -126,23 +126,28 @@ class Summarizer:
                 raw_values = [x.get("solutions_preserved") for x in data]
                 normalized = []
                 for v in raw_values:
-                    nv = "unknown" if v is None else str(v).strip().lower()
-                    if nv not in ("yes", "no", "unknown"):
+                    if v is None:
                         nv = "unknown"
+                    elif isinstance(v, bool):
+                        nv = "yes" if v else "no"
+                    else:
+                        nv = str(v).strip().lower()
+                        if nv not in ("yes", "no", "unknown"):
+                            nv = "unknown"
                     normalized.append(nv)
 
-                # Prefer "yes" when all are unknown (ties both conditions)
                 if all(v in ("yes", "unknown") for v in normalized):
                     solutions_preserved = "yes"
                 elif all(v in ("no", "unknown") for v in normalized):
                     solutions_preserved = "no"
                 else:
                     solutions_preserved = "partly"
+
             else:
                 avg_time_preprocessor = "No run finished"
                 avg_time_solver = "No run finished"
                 avg_time_total = "No run finished"
-                solutions_preserved = "No data"
+                solutions_preserved = "No run finished"
 
             percentage_finished = len(finished_data) * 100 / len(data)
             table.append(

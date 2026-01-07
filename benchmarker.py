@@ -67,7 +67,7 @@ class Benchmarker:
                             # Ensure the p cnf header uses the original variable count
                             # NOTE: Do NOT call this for SharpSatPreprocessor (or sequences containing it)
                             # as it eliminates unused variables and the header must reflect the actual var count
-                            if "SharpSatPreprocessor" not in preprocessor_name and "EquivalentLiteralElimination" not in preprocessor_name:
+                            if "SharpSatPreprocessor" not in preprocessor_name:
                                 try:
                                     fix_pcnf_header_to_original(dimacs, target_path)
                                 except Exception:
@@ -138,7 +138,6 @@ class Benchmarker:
                 "solver_time",
                 "total_time",
                 "number_of_solutions",
-                # "factor_times_number",
                 "solutions_preserved",
             ]
             self.writer.writeheader()

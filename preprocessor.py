@@ -182,14 +182,14 @@ class BoundedVariableElimination(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
-class BoundsConsistencyElimination(ExecutablePreprocessor):
-    """A preprocessor that applies bounded consistency elimination (BCE).
+class BlockedClauseElimination(ExecutablePreprocessor):
+    """A preprocessor that applies blocked clause elimination (BCE).
 
     For details about BCE see preprocessors.md.
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-ee -no-probe -bce -dimacs={target} {source}"
-    name = "BoundsConsistencyElimination"
+    name = "BlockedClauseElimination"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
