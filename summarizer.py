@@ -116,10 +116,25 @@ class Summarizer:
                     no_preprocessor_results[solver] = avg_time_total
                 
                 # Determine solutions_preserved status
-                solutions_preserved_values = [x.get("solutions_preserved", "unknown") for x in finished_data]
-                if all(v != "no" for v in solutions_preserved_values):
+                # Desired behavior:
+                # - "yes"  if all entries are either "yes" or "unknown"
+                # - "no"   if all entries are either "no" or "unknown"
+                # - "partly" otherwise
+                # Note: treat None/empty/unrecognized values as "unknown" and compare case-insensitively.
+                # Base classification on all runs for this solver+preprocessor,
+                # not only finished ones, as requested.
+                raw_values = [x.get("solutions_preserved") for x in data]
+                normalized = []
+                for v in raw_values:
+                    nv = "unknown" if v is None else str(v).strip().lower()
+                    if nv not in ("yes", "no", "unknown"):
+                        nv = "unknown"
+                    normalized.append(nv)
+
+                # Prefer "yes" when all are unknown (ties both conditions)
+                if all(v in ("yes", "unknown") for v in normalized):
                     solutions_preserved = "yes"
-                elif all(v != "yes" for v in solutions_preserved_values):
+                elif all(v in ("no", "unknown") for v in normalized):
                     solutions_preserved = "no"
                 else:
                     solutions_preserved = "partly"
