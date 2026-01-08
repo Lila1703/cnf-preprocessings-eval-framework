@@ -46,6 +46,24 @@ def names_of_subclasses(cls):
     return [scls.__name__ for scls in cls.__subclasses__()]
 
 
+def expand_dimacs_paths(paths):
+    """Expand paths to include files from directories recursively."""
+    expanded = []
+    for path in paths:
+        if os.path.isfile(path):
+            expanded.append(path)
+        elif os.path.isdir(path):
+            # Recursively find all files in the directory
+            for root, dirs, files in os.walk(path):
+                for file in sorted(files):
+                    file_path = os.path.join(root, file)
+                    expanded.append(file_path)
+        else:
+            print("Path '{}' doesn't exist".format(path))
+            exit(1)
+    return expanded
+
+
 def validate_arguments(args):
     solvers = []
     preprocessors = []
@@ -66,10 +84,12 @@ def validate_arguments(args):
             exit(1)
         solvers.append(solver())
 
-    for d in args.dimacs:
-        if not isfile(d):
-            print("File '{}' doesn't exist".format(d))
-            exit(1)
+    # Expand paths: if directory, recursively find all files inside
+    dimacs = expand_dimacs_paths(args.dimacs)
+    
+    if not dimacs:
+        print("No DIMACS files found in the provided paths")
+        exit(1)
 
     if args.number_of_executions < 1:
         print(
@@ -102,7 +122,7 @@ def validate_arguments(args):
     return (
         solvers,
         preprocessors,
-        args.dimacs,
+        dimacs,
         args.number_of_executions,
         args.timeout,
         writer,
@@ -225,10 +245,12 @@ if __name__ == "__main__":
             print("No preprocessors specified; nothing to check. Use -p to list preprocessors.")
             exit(0)
 
-        for d in args.dimacs:
-            if not isfile(d):
-                print("File '{}' doesn't exist".format(d))
-                exit(1)
+        # Expand paths: if directory, recursively find all files inside
+        dimacs_files = expand_dimacs_paths(args.dimacs)
+        
+        if not dimacs_files:
+            print("No DIMACS files found in the provided paths")
+            exit(1)
 
         if args.timeout and args.timeout <= 0:
             print("Timeout {} must be greater than zero".format(args.timeout))
@@ -258,7 +280,7 @@ if __name__ == "__main__":
             pass
 
         # For each dimacs and preprocessor produce a PASS/FAIL
-        for dimacs in args.dimacs:
+        for dimacs in dimacs_files:
             for preprocessor in preprocessors:
                 preprocessor_name = preprocessor.name
                 target_path = get_temp_dimacs_path(dimacs, preprocessor.name, keep_dimacs)
