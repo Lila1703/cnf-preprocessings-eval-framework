@@ -125,6 +125,7 @@ def validate_arguments(args):
         dimacs,
         args.number_of_executions,
         args.timeout,
+        getattr(args, "mem_limit_mb", None),
         writer,
         keep_dimacs,
         copy_comments
@@ -143,6 +144,7 @@ if __name__ == "__main__":
     run.add_argument("-a", "--accumulate", action="store_true", help="Run each preprocessor repeated 1..n times (accumulate)")
     run.add_argument("-p", "--preprocessor", nargs="+", default=[])
     run.add_argument("-t", "--timeout", type=float)
+    run.add_argument("--mem-limit-mb", type=int, help="Per-process memory limit in MB (applies to solvers)")
     run.add_argument("-s", "--solver", nargs="+", required=True)
     run.add_argument("-d", "--dimacs", nargs="+", required=True)
     run.add_argument("-o", "--output")
@@ -153,6 +155,7 @@ if __name__ == "__main__":
     check = subparsers.add_parser("check")
     check.add_argument("-p", "--preprocessor", nargs="+", default=[])
     check.add_argument("-t", "--timeout", type=float)
+    check.add_argument("--mem-limit-mb", type=int, help="Per-process memory limit in MB (applies to counter solver)")
     check.add_argument("-d", "--dimacs", nargs="+", required=True)
     check.add_argument("-S", "--sat-solver", default="./solvers/MiniSat_v1.14_linux {input}")
     check.add_argument("--count-check", action="store_true", help="Run a model-count check instead of the SAT equivalence check")
@@ -177,6 +180,7 @@ if __name__ == "__main__":
             dimacs,
             number_of_executions,
             timeout,
+            mem_limit_mb,
             output_writer,
             keep_dimacs,
             copy_comments,
@@ -221,6 +225,7 @@ if __name__ == "__main__":
             dimacs,
             number_of_executions,
             timeout,
+            mem_limit_mb,
             summarizer,
             output_writer,
             progress_bar,
@@ -305,8 +310,8 @@ if __name__ == "__main__":
                         exit(1)
 
                     counter = counter_cls()
-                    orig_count = counter.run(dimacs, args.timeout)
-                    pre_count = counter.run(target_path, args.timeout)
+                    orig_count = counter.run(dimacs, args.timeout, mem_limit_mb=getattr(args, "mem_limit_mb", None))
+                    pre_count = counter.run(target_path, args.timeout, mem_limit_mb=getattr(args, "mem_limit_mb", None))
 
                     status = 'UNKNOWN'
                     try:

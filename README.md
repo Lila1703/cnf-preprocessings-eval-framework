@@ -66,6 +66,7 @@ The following options are supported:
 - `-n`/`--number-of-executions` with the number of times the benchmark should be repeated (optional, default: 1)
 - `-o`/`--output` with the file where the full results should be written to (optional, default: full results are discarded)
 - `-t`/`--timeout` with the timeout (in seconds) after which a solver/preprocessor should be terminated (optional, default: no timeout)
+- `--mem-limit-mb` sets a per-process memory limit in megabytes for solver runs; if a solver exceeds the limit, it is terminated and the run is marked unfinished. Useful to prevent D4 (or others) from exhausting system RAM.
 
 The output on the command line will be a summary of the full results sorted by the average total time:
 
@@ -116,3 +117,4 @@ Notes and flags:
 - `--count-check` : run a model-count comparison (uses the solver class named by `--counter`).
 - `--counter` : name of the counting solver to use (default: `SharpSat`). The name must match a solver class in `solver.py`.
 - `-t`/`--timeout` : timeout in seconds for solver/preprocessor runs.
+- `--mem-limit-mb` : per-process memory cap (MB) applied to the counter solver when `--count-check` is used.
