@@ -1,6 +1,8 @@
-from subprocess import check_output, STDOUT, CalledProcessError, TimeoutExpired
+import subprocess
+from subprocess import STDOUT, CalledProcessError, TimeoutExpired
 from re import search
 from shlex import split
+import resource
 
 
 class ExecutableSolver:
@@ -19,14 +21,31 @@ class ExecutableSolver:
     that given the output of your solver returns the number of solutions.
     """
 
-    def run(self, input, timeout=None):
+    def run(self, input, timeout=None, mem_limit_mb=None):
         """Runs this solver on the file `input`.
         Returns the number of solutions the solver found."""
         try:
             command = split(self.command_line.format(input=input))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+
+            def _set_limits():
+                # Limit address space to avoid excessive RAM usage (Linux)
+                if mem_limit_mb is not None:
+                    limit_bytes = int(mem_limit_mb) * 1024 * 1024
+                    resource.setrlimit(resource.RLIMIT_AS, (limit_bytes, limit_bytes))
+
+            result = subprocess.run(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=STDOUT,
+                timeout=timeout,
+                text=True,
+                preexec_fn=_set_limits,
+            )
+            if result.returncode != 0:
+                return None
+            output = result.stdout
         except CalledProcessError as e:
-            output = e.output
+            output = e.output if isinstance(e.output, str) else str(e.output)
         except TimeoutExpired as e:
             return None
         return self.get_number_of_solutions(str(output))

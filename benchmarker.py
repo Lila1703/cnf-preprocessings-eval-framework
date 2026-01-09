@@ -11,6 +11,7 @@ class Benchmarker:
         dimacs,
         number_of_executions,
         timeout=None,
+        mem_limit_mb=None,
         summarizer=None,
         writer=None,
         progress_bar=None,
@@ -22,6 +23,7 @@ class Benchmarker:
         self.solvers = solvers
         self.number_of_executions = number_of_executions
         self.timeout = timeout
+        self.mem_limit_mb = mem_limit_mb
         self.summarizer = summarizer
         self.writer = writer
         self.progress_bar = progress_bar
@@ -81,6 +83,7 @@ class Benchmarker:
                             self.timeout - preprocessor_time
                             if self.timeout is not None
                             else None,
+                            mem_limit_mb=self.mem_limit_mb,
                         )
                         solver_time = time() - solver_start_time
 
