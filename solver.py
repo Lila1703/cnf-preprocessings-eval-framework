@@ -38,17 +38,17 @@ class ExecutableSolver:
                 stdout=subprocess.PIPE,
                 stderr=STDOUT,
                 timeout=timeout,
-                text=True,
+                text=False,
                 preexec_fn=_set_limits,
             )
             if result.returncode != 0:
                 return None
-            output = result.stdout
+            output = result.stdout.decode('utf-8', errors='ignore')
         except CalledProcessError as e:
             output = e.output if isinstance(e.output, str) else str(e.output)
         except TimeoutExpired as e:
             return None
-        return self.get_number_of_solutions(str(output))
+        return self.get_number_of_solutions(output)
 
     def get_number_of_solutions(self, output):
         """Returns the number of solutions the solver found."""
@@ -95,7 +95,7 @@ class DSharp(ExecutableSolver):
     name = "DSharp"
 
     def get_number_of_solutions(self, output):
-        found = search("#SAT \\(full\\):   \\\\t\\\\t(\\d+)", output)
+        found = search("#SAT \\(full\\):\\s+(\\d+)", output)
         if found:
             return found.group(1)
 

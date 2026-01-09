@@ -211,6 +211,8 @@ __marimo__/
 
 # Outputs
 *.csv
+*.dimacs
 
 #Python
 /bin 
+
