@@ -402,8 +402,18 @@ class CoprocessorSequence(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -subsimp -hte -ent -dimacs={target} {source}"
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -hte -subsimp -ent -dimacs={target} {source}"
     name = "CoprocessorSequence"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class CoprocessorSequence2(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -subsimp -ent -hte -dimacs={target} {source}"
+    name = "CoprocessorSequence2"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
