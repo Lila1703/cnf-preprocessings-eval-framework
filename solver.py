@@ -95,7 +95,7 @@ class DSharp(ExecutableSolver):
     name = "DSharp"
 
     def get_number_of_solutions(self, output):
-        found = search("#SAT \\(full\\):   \\\\t\\\\t(\\d+)", output)
+        found = search("#SAT \\(full\\):\\s+(\\d+)", output)
         if found:
             return found.group(1)
 
