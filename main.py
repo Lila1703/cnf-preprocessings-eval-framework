@@ -7,6 +7,8 @@ from solver import ExecutableSolver
 from preprocessor import ExecutablePreprocessor, NoPreprocessor, PreprocessorSequence
 from benchmarker import Benchmarker
 from summarizer import Summarizer
+from equivalence_checker import EquivalenceChecker
+from equivalence_summarizer import EquivalenceSummarizer
 from writer import ResultWriter
 from util import get_temp_dimacs_path, get_comments_string, preprend_content
 import os
@@ -158,8 +160,9 @@ if __name__ == "__main__":
     check.add_argument("--mem-limit-mb", type=int, help="Per-process memory limit in MB (applies to counter solver)")
     check.add_argument("-d", "--dimacs", nargs="+", required=True)
     check.add_argument("-S", "--sat-solver", default="./solvers/MiniSat_v1.14_linux {input}")
-    check.add_argument("--count-check", action="store_true", help="Run a model-count check instead of the SAT equivalence check")
-    check.add_argument("--counter", default="SharpSat", help="Name of counting solver class to use (e.g. D4V2, SharpSat)")
+    check.add_argument("--counter", default="d4", help="Name of counting solver class to use (e.g. D4V2, SharpSat)")
+    check.add_argument("-o", "--output")
+    check.add_argument("-sum", "--summary", help="Path to output summary CSV file (default: equivalence_summary.csv)", nargs="?", const="equivalence_summary.csv")
     check.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
     check.add_argument("-c", "--copy_comments", action=BooleanOptionalAction)
 
@@ -265,8 +268,8 @@ if __name__ == "__main__":
         copy_comments = True if args.copy_comments else False
 
         sat_solver = args.sat_solver
-        do_count_check = args.count_check
         counter_name = args.counter
+        
         # If default MiniSat binary is present but not executable, try to fix permissions
         try:
             solver_first_token = sat_solver.split()[0]
@@ -284,91 +287,40 @@ if __name__ == "__main__":
         except Exception:
             pass
 
-        # For each dimacs and preprocessor produce a PASS/FAIL
-        for dimacs in dimacs_files:
-            for preprocessor in preprocessors:
-                preprocessor_name = preprocessor.name
-                target_path = get_temp_dimacs_path(dimacs, preprocessor.name, keep_dimacs)
+        # Get counter solver instance
+        counter_cls = find_solver_by_name(counter_name)
+        if counter_cls is None:
+            print(f"Counter solver '{counter_name}' is not registered. Available solvers: {', '.join(names_of_subclasses(ExecutableSolver))}")
+            exit(1)
+        counter = counter_cls()
 
-                # run preprocessor
-                factor = preprocessor.run(dimacs, target_path, args.timeout)
+        # Setup output writer if requested
+        if args.output:
+            file = open(args.output, "w", newline="")
+            output_writer = ResultWriter(file, [])
+        else:
+            output_writer = None
 
-                if copy_comments:
-                    comments = get_comments_string(dimacs)
-                    preprend_content(comments, target_path)
+        # Setup progress bar
+        progress_bar = Bar(
+            "Checking", width=50, suffix="%(index)d/%(max)d - ETA: %(eta)ds"
+        )
 
-                # If requested, run a counting-based check: compare model counts
-                if do_count_check:
-                    counter_cls = find_solver_by_name(counter_name)
-                    if counter_cls is None:
-                        print(f"Counter solver '{counter_name}' is not registered. Available solvers: {', '.join(names_of_subclasses(ExecutableSolver))}")
-                        if not keep_dimacs and os.path.exists(target_path):
-                            try:
-                                os.remove(target_path)
-                            except Exception:
-                                pass
-                        exit(1)
+        # Setup summarizer
+        summarizer = EquivalenceSummarizer(summary_csv_file=args.summary)
 
-                    counter = counter_cls()
-                    orig_count = counter.run(dimacs, args.timeout, mem_limit_mb=getattr(args, "mem_limit_mb", None))
-                    pre_count = counter.run(target_path, args.timeout, mem_limit_mb=getattr(args, "mem_limit_mb", None))
-
-                    status = 'UNKNOWN'
-                    try:
-                        from fractions import Fraction
-
-                        if orig_count is None or pre_count is None:
-                            status = 'UNKNOWN'
-                        elif factor is None:
-                            status = 'PASS' if orig_count == pre_count else 'FAIL'
-                        else:
-                            expected = Fraction(pre_count) * Fraction(factor)
-                            if expected.denominator == 1:
-                                status = 'PASS' if orig_count == expected.numerator else 'FAIL'
-                            else:
-                                status = 'FAIL'
-                    except Exception:
-                        status = 'UNKNOWN'
-
-                    if not keep_dimacs and os.path.exists(target_path):
-                        try:
-                            os.remove(target_path)
-                        except Exception:
-                            pass
-
-                    print(f"{preprocessor_name} on {dimacs}: {status} (count-check using {counter_name})")
-                    continue
-
-                # build difference CNFs and run SAT checks
-                base = os.path.splitext(os.path.basename(dimacs))[0]
-                check1 = f"temp.check.{preprocessor_name}.{base}.1.dimacs"
-                check2 = f"temp.check.{preprocessor_name}.{base}.2.dimacs"
-
-                build_diff_cnf(dimacs, target_path, check1, mode='F_and_not_G')
-                sat1 = run_sat_solver(sat_solver, check1, timeout=args.timeout)
-
-                build_diff_cnf(dimacs, target_path, check2, mode='G_and_not_F')
-                sat2 = run_sat_solver(sat_solver, check2, timeout=args.timeout)
-
-                # cleanup
-                if not keep_dimacs and os.path.exists(target_path):
-                    try:
-                        os.remove(target_path)
-                    except Exception:
-                        pass
-                for f in (check1, check2):
-                    if os.path.exists(f):
-                        try:
-                            os.remove(f)
-                        except Exception:
-                            pass
-
-                status = None
-                if sat1 is None or sat2 is None:
-                    status = 'UNKNOWN'
-                elif sat1 or sat2:
-                    status = 'FAIL'
-                else:
-                    status = 'PASS'
-
-                print(f"{preprocessor_name} on {dimacs}: {status}")
+        # Create and run equivalence checker
+        checker = EquivalenceChecker(
+            preprocessors,
+            dimacs_files,
+            counter,
+            sat_solver,
+            args.timeout,
+            getattr(args, "mem_limit_mb", None),
+            summarizer,
+            output_writer,
+            progress_bar,
+            keep_dimacs,
+            copy_comments
+        )
+        checker.run()
