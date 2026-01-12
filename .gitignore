@@ -214,3 +214,7 @@ __marimo__/
 
 #Python
 /bin 
+
+*.dimacs
+*.nnf
+out.mc
