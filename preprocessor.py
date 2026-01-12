@@ -88,6 +88,18 @@ class Subsumption(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
+    
+class Subsumption2(ExecutablePreprocessor):
+    """A preprocessnor that applies subsumption.
+
+    For details about subsumption see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -subsimp -dimacs={target} {source}"
+    name = "Subsumption2"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
 
 
 class EquivalentLiteralElimination(ExecutablePreprocessor):
@@ -129,7 +141,6 @@ class HiddenTautologyElimination(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
-
 
 class SharpSatPreprocessor(ExecutablePreprocessor):
     """A preprocessnor that applies the sharpsat preprocessor.
@@ -394,6 +405,16 @@ class TestCoprocessor(ExecutablePreprocessor):
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -dimacs={target} {source}"
     name = "TestCoprocessor"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class CoprocessorOff(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -no-enabled_cp3  -dimacs={target} {source}"
+    name = "CoprocessorOff"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
