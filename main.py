@@ -77,7 +77,8 @@ def validate_arguments(args):
             exit(1)
         preprocessors.append(preprocessor)
 
-    preprocessors.append(NoPreprocessor())
+    if not args.nonopreprocessor:
+        preprocessors.append(NoPreprocessor())
 
     for s in args.solver:
         solver = find_solver_by_name(s)
@@ -153,6 +154,7 @@ if __name__ == "__main__":
     run.add_argument("-sum", "--summary", help="Path to output summary CSV file (default: summary.csv)", nargs="?", const="summary.csv")
     run.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
     run.add_argument("-c", "--copy_comments", action=BooleanOptionalAction)
+    run.add_argument("--nonopreprocessor", action="store_true", help="Disable automatic execution of NoPreprocessor baseline")
 
     check = subparsers.add_parser("check")
     check.add_argument("-p", "--preprocessor", nargs="+", default=[])
