@@ -1,6 +1,6 @@
 import subprocess
 from subprocess import STDOUT, CalledProcessError, TimeoutExpired
-from re import search
+from re import search, MULTILINE
 from shlex import split
 import resource
 
@@ -134,27 +134,13 @@ class D4V2(ExecutableSolver):
 
     See https://github.com/SoftVarE-Group/d4v2    
     """
-
-    command_line = "solvers/d4v2 -i {input} -m ddnnf-compiler"
+    
+    command_line = "./solvers/d4v2 -i {input}"
     name = "d4v2"
 
     def get_number_of_solutions(self, output):
-        found = search("s (\\d+)", output)
-        if found:
-            return found.group(1)
-    
-
-class PD4(ExecutableSolver):
-    """Projected compilation with d4v2
-    
-    See https://github.com/SoftVarE-Group/d4v2 
-    """
-
-    command_line = "solvers/d4v2 -i {input} -m proj-ddnnf-compiler"
-    name = "pd4"
-
-    def get_number_of_solutions(self, output):
-        found = search("s (\\d+)", output)
+        # Match the solution line even if there is leading/trailing whitespace
+        found = search(r"^s\s+([0-9]+)", output, flags=MULTILINE)
         if found:
             return found.group(1)
 

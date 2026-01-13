@@ -448,6 +448,80 @@ class DefaultCoprocessor(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
+    
+
+# D4v2 Preprocessors
+
+class Vivification(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p vivification --target {target} --preproc-only 1"
+    name = "Vivification"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class D4Basic(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p basic --target {target} --preproc-only 1"
+    name = "D4Basic"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class Backbone(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p backbone --target {target} --preproc-only 1"
+    name = "Backbone"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class OccurrenceElimination(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p occElimination --target {target} --preproc-only 1"
+    name = "OccurrenceElimination"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class Combinaison(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p combinaison --target {target} --preproc-only 1"
+    name = "Combinaison"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class D4SharpEquiv(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p sharpEquiv --target {target} --preproc-only 1"
+    name = "D4SharpEquiv"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class D4Equiv(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p equiv --target {target} --preproc-only 1"
+    name = "D4Equiv"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
 
 class PreprocessorSequence(Preprocessor):
     """A preprocessor that applies multiple given preprocessors in order."""
