@@ -40,15 +40,22 @@ class EquivalenceChecker:
         results = []
 
         for dimacs in self.dimacs:
-            # Get original count once per dimacs file
+            # Get original count once per dimacs file and normalize to int if possible
             original_count = None
+            original_count_int = None
             if self.counter_solver:
                 try:
                     original_count = self.counter_solver.run(
                         dimacs, self.timeout, mem_limit_mb=self.mem_limit_mb
                     )
+                    if original_count is not None:
+                        try:
+                            original_count_int = int(original_count)
+                        except (ValueError, TypeError):
+                            original_count_int = None
                 except Exception:
                     original_count = None
+                    original_count_int = None
 
             for preprocessor in self.preprocessors:
                 preprocessor_name = preprocessor.name
@@ -75,10 +82,9 @@ class EquivalenceChecker:
                     "dimacs": dimacs,
                     "preprocessor_name": preprocessor_name,
                     "preprocessor_time": preprocessor_time,
-                    "solutions_preserved": None,
-                    "logically_equivalent": None,
-                    "count_check_status": None,
-                    "sat_check_status": None,
+                    "logically_equivalent": "unknown",
+                    "count_check_status": "UNKNOWN",
+                    "sat_check_status": "UNKNOWN",
                 }
 
                 # Run count check
@@ -90,48 +96,32 @@ class EquivalenceChecker:
 
                         # Convert counts to integers (solver.run() may return strings)
                         pre_count_int = None
-                        original_count_int = None
-                        
                         if pre_count is not None:
                             try:
                                 pre_count_int = int(pre_count)
                             except (ValueError, TypeError):
                                 pass
-                        
-                        if original_count is not None:
-                            try:
-                                original_count_int = int(original_count)
-                            except (ValueError, TypeError):
-                                pass
 
                         if original_count_int is None or pre_count_int is None:
                             entry["count_check_status"] = "UNKNOWN"
-                            entry["solutions_preserved"] = None
                         elif factor is None:
                             # No factor returned, so we expect counts to be equal
                             if original_count_int == pre_count_int:
                                 entry["count_check_status"] = "PASS"
-                                entry["solutions_preserved"] = "yes"
                             else:
                                 entry["count_check_status"] = "FAIL"
-                                entry["solutions_preserved"] = "no"
                         else:
                             # Factor was returned, compute expected original count
                             expected = Fraction(pre_count_int) * Fraction(factor)
                             if expected.denominator == 1:
                                 if original_count_int == expected.numerator:
                                     entry["count_check_status"] = "PASS"
-                                    # Preserve solutions only if factor == 1; otherwise solution count changed.
-                                    entry["solutions_preserved"] = "yes" if Fraction(factor) == 1 else "no"
                                 else:
                                     entry["count_check_status"] = "FAIL"
-                                    entry["solutions_preserved"] = "no"
                             else:
                                 entry["count_check_status"] = "FAIL"
-                                entry["solutions_preserved"] = "no"
                     except Exception:
                         entry["count_check_status"] = "ERROR"
-                        entry["solutions_preserved"] = None
                 else:
                     entry["count_check_status"] = "SKIPPED"
 
@@ -158,7 +148,7 @@ class EquivalenceChecker:
 
                         if sat1 is None or sat2 is None:
                             entry["sat_check_status"] = "UNKNOWN"
-                            entry["logically_equivalent"] = None
+                            entry["logically_equivalent"] = "unknown"
                         elif sat1 or sat2:
                             entry["sat_check_status"] = "FAIL"
                             entry["logically_equivalent"] = "no"
@@ -167,7 +157,7 @@ class EquivalenceChecker:
                             entry["logically_equivalent"] = "yes"
                     except Exception:
                         entry["sat_check_status"] = "ERROR"
-                        entry["logically_equivalent"] = None
+                        entry["logically_equivalent"] = "unknown"
                 else:
                     entry["sat_check_status"] = "SKIPPED"
 
@@ -195,7 +185,6 @@ class EquivalenceChecker:
                 "dimacs",
                 "preprocessor_name",
                 "preprocessor_time",
-                "solutions_preserved",
                 "logically_equivalent",
                 "count_check_status",
                 "sat_check_status",

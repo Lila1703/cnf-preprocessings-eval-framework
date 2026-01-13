@@ -38,34 +38,6 @@ class EquivalenceSummarizer:
             sat_check_fail = sum(1 for x in data if x.get("sat_check_status") == "FAIL")
             sat_check_unknown = sum(1 for x in data if x.get("sat_check_status") in ["UNKNOWN", "SKIPPED", "ERROR", None])
             
-            # Aggregate solutions_preserved
-            # - "yes" if all entries are "yes"
-            # - "no" if all entries are "no"
-            # - "partly" if mixed or if all are None/unknown
-            solutions_values = [x.get("solutions_preserved") for x in data]
-            normalized_solutions = []
-            for v in solutions_values:
-                if v is None:
-                    normalized_solutions.append("unknown")
-                elif isinstance(v, bool):
-                    normalized_solutions.append("yes" if v else "no")
-                else:
-                    nv = str(v).strip().lower()
-                    if nv not in ("yes", "no", "unknown"):
-                        nv = "unknown"
-                    normalized_solutions.append(nv)
-            
-            if all(v == "yes" for v in normalized_solutions):
-                solutions_preserved = "yes"
-            elif all(v == "no" for v in normalized_solutions):
-                solutions_preserved = "no"
-            elif all(v in ("yes", "unknown") for v in normalized_solutions) and any(v == "yes" for v in normalized_solutions):
-                solutions_preserved = "yes"
-            elif all(v in ("no", "unknown") for v in normalized_solutions) and any(v == "no" for v in normalized_solutions):
-                solutions_preserved = "no"
-            else:
-                solutions_preserved = "partly"
-            
             # Aggregate logically_equivalent
             # - "yes" if all entries are "yes"
             # - "no" if any entry is "no"
@@ -99,7 +71,6 @@ class EquivalenceSummarizer:
             table.append([
                 preprocessor_name,
                 avg_preprocessor_time,
-                solutions_preserved,
                 logically_equivalent,
                 count_status_str,
                 sat_status_str,
@@ -108,7 +79,6 @@ class EquivalenceSummarizer:
         headers = [
             "Preprocessor",
             "Avg. preprocessing time",
-            "Solutions preserved",
             "Logically equivalent",
             "Count check (P/F/U)",
             "SAT check (P/F/U)",
