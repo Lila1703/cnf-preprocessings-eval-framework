@@ -98,6 +98,7 @@ class Benchmarker:
                             "preprocessor_time": preprocessor_time,
                             "solver_time": solver_time,
                             "total_time": preprocessor_time + solver_time,
+                            "preprocessing_factor": preprocessing_factor,
                             "number_of_solutions": number_of_solutions,
                             "finished": number_of_solutions is not None,
                             # fill solutions_preserved later after we know NoPreprocessor
@@ -141,6 +142,7 @@ class Benchmarker:
                 "preprocessor_time",
                 "solver_time",
                 "total_time",
+                "preprocessing_factor",
                 "number_of_solutions",
                 "solutions_preserved",
             ]

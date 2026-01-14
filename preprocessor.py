@@ -108,7 +108,7 @@ class EquivalentLiteralElimination(ExecutablePreprocessor):
     For details about equivalent literal elimination see preprocessors.md.
     """
 
-    command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -no-enabled_cp3  -dimacs={target} {source}"
+    command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -dimacs={target} {source}"
     name = "EquivalentLiteralElimination"
 
     def get_factor_of_number_of_solutions(self, output):
