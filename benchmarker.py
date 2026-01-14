@@ -56,8 +56,8 @@ class Benchmarker:
                             dimacs, preprocessor.name, self.keep_dimacs)
 
                         preprocessor_start_time = time()
-                        # Run preprocessor; legacy API returns a factor that we ignore.
-                        _ = preprocessor.run(
+                        # run method returns a factor to multiply the number of solutions with
+                        preprocessing_factor = preprocessor.run(
                             dimacs, target_path, self.timeout)
                         preprocessor_time = time() - preprocessor_start_time
 
@@ -78,13 +78,14 @@ class Benchmarker:
                         solver_start_time = time()
                         # Use the preprocessed file if it exists, otherwise fall back to original DIMACS.
                         solver_input_path = target_path if path.isfile(target_path) else dimacs
-                        number_of_solutions = solver.run(
+                        number_of_solutions_raw = solver.run(
                             solver_input_path,
                             self.timeout - preprocessor_time
                             if self.timeout is not None
                             else None,
                             mem_limit_mb=self.mem_limit_mb,
                         )
+                        number_of_solutions = int(int(number_of_solutions_raw) * preprocessing_factor) if number_of_solutions_raw is not None and preprocessing_factor is not None else None
                         solver_time = time() - solver_start_time
 
                         if not self.keep_dimacs and path.isfile(target_path):

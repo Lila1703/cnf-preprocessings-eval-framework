@@ -108,15 +108,14 @@ class EquivalentLiteralElimination(ExecutablePreprocessor):
     For details about equivalent literal elimination see preprocessors.md.
     """
 
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-probe -ee -no-cp3_eagerGates -dimacs={target} {source}"
+    command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -no-enabled_cp3  -dimacs={target} {source}"
     name = "EquivalentLiteralElimination"
 
     def get_factor_of_number_of_solutions(self, output):
         found = search("(\\d+) ee-lits", output)
         if found:
             return Fraction(1, 2 ** int(found.group(1)))
-
-
+        
 class Probing(ExecutablePreprocessor):
     """A preprocessnor that applies probing.
 
@@ -624,6 +623,8 @@ class PreprocessorSequence(Preprocessor):
                             pass
             except Exception:
                 pass
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
 
 def _set_header_to_max_var(input_file, output_file, target_var_count=None):
     """Set the header to use target_var_count (or max var if not specified).
