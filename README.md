@@ -30,12 +30,42 @@ The following preprocessors are registered:
 NoPreprocessor
 UnitPropagation
 Subsumption
+    Subsumption2
 EquivalentLiteralElimination
 Probing
 HiddenTautologyElimination
 SharpSatPreprocessor
 BinaryResolution
 HyperBinaryResolution
+BoundedVariableElimination
+BlockedClauseElimination
+XorReasoning
+FourierMotzkin
+DensePreprocessor
+Simplification
+UnhidingPreprocessor
+SymmetryDetection
+BoundedVariableAddition
+CoveredClauseElimination
+ShufflePreprocessor
+TernaryClauseResolution
+ResolutionAsymmetricTautologyElimination
+LiteralAddition
+ExperimentalSimplification
+EntailedRedundancyCheck
+ModularityBasedPreprocessing
+    TestCoprocessor
+    CoprocessorOff
+    CoprocessorSequence
+    CoprocessorSequence2
+    DefaultCoprocessor
+Vivification
+D4Basic
+Backbone
+OccurrenceElimination
+Combinaison
+D4SharpEquiv
+D4Equiv
 ```
 
 ### Running benchmarks:
