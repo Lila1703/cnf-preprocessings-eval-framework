@@ -1,5 +1,5 @@
 from tabulate import tabulate
-from csv import writer
+from csv import writer, DictReader
 
 from itertools import groupby
 from preprocessor import NoPreprocessor
@@ -39,6 +39,40 @@ class Summarizer:
     def groupby_solver(self, results):
         results.sort(key=lambda x: x["solver_name"])
         return groupby(results, key=lambda x: x["solver_name"])
+
+    def summarize(self, input_csv_file):
+        """Read results from a CSV file and generate a summary."""
+        results = []
+        
+        try:
+            with open(input_csv_file, "r") as f:
+                reader = DictReader(f)
+                for row in reader:
+                    # Convert string values to appropriate types
+                    result = {
+                        "dimacs": row["dimacs"],
+                        "preprocessor_name": row["preprocessor_name"],
+                        "solver_name": row["solver_name"],
+                        "preprocessor_time": float(row["preprocessor_time"]) if row["preprocessor_time"] else 0.0,
+                        "solver_time": float(row["solver_time"]) if row["solver_time"] else 0.0,
+                        "number_of_solutions": row["number_of_solutions"] if row["number_of_solutions"] else None,
+                        "solutions_preserved": row.get("solutions_preserved", "unknown"),
+                        "finished": True if row["number_of_solutions"] else None,
+                    }
+                    results.append(result)
+        except FileNotFoundError:
+            print(f"Error: Input file '{input_csv_file}' not found")
+            return
+        except Exception as e:
+            print(f"Error reading input file '{input_csv_file}': {e}")
+            return
+        
+        if not results:
+            print("No results found in input file")
+            return
+        
+        # Use the same logic as run() method
+        self.run(results)
 
     def run(self, results):
         successful_runs = list(filter(lambda x: x["finished"], results))
@@ -100,6 +134,8 @@ class Summarizer:
         print("Results:")
         table = []
         no_preprocessor_results = {}
+        # Track which DIMACS files were successfully completed by NoPreprocessor for each solver
+        no_preprocessor_successful_dimacs = {}
 
         for ((solver, preprocessor), data) in self.groupby_solver_preprocessor(results):
             data = list(data)
@@ -114,6 +150,10 @@ class Summarizer:
                 avg_time_total = avg_time_preprocessor + avg_time_solver
                 if preprocessor == NoPreprocessor().name:
                     no_preprocessor_results[solver] = avg_time_total
+                    # Track which DIMACS files were successfully completed by NoPreprocessor
+                    no_preprocessor_successful_dimacs[solver] = set(
+                        x["dimacs"] for x in finished_data
+                    )
                 
                 # Determine solutions_preserved status
                 # Desired behavior:
@@ -164,10 +204,33 @@ class Summarizer:
             )
 
         for i in range(len(table)):
-            if no_preprocessor_results.get(table[i][0]) and type(table[i][4]) == float:
-                table[i][5] = no_preprocessor_results[table[i][0]] / table[i][4]
-            else:
-                table[i][5] = "No data"
+            solver = table[i][0]
+            preprocessor = table[i][1]
+            current_time = table[i][4]
+            table[i][5] = "No data"  # Default value
+            
+            # Calculate speedup based only on DIMACS files that NoPreprocessor completed
+            if (solver in no_preprocessor_results and 
+                solver in no_preprocessor_successful_dimacs and
+                preprocessor != NoPreprocessor().name and
+                type(current_time) == float):
+                
+                # Find the runs for this solver+preprocessor combination
+                matching_runs = [
+                    x for x in results 
+                    if x["solver_name"] == solver 
+                    and x["preprocessor_name"] == preprocessor
+                    and x["finished"]
+                    and x["dimacs"] in no_preprocessor_successful_dimacs[solver]
+                ]
+                
+                if matching_runs:
+                    # Calculate average time for only the DIMACS files that NoPreprocessor completed
+                    average_time_total_speedup = sum(
+                        x["preprocessor_time"] + x["solver_time"] 
+                        for x in matching_runs
+                    ) / len(matching_runs)
+                    table[i][5] = no_preprocessor_results[solver] / average_time_total_speedup
 
         table.sort(key=lambda x: str(x[4]))
 

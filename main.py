@@ -142,6 +142,10 @@ if __name__ == "__main__":
     list_solvers = subparsers.add_parser("solvers")
     list_preprocessors = subparsers.add_parser("preprocessors")
 
+    summarize = subparsers.add_parser("summarize")
+    summarize.add_argument("input", help="Path to input CSV file (e.g., output.csv)")
+    summarize.add_argument("-o", "--output", help="Path to output summary CSV file (default: <input>_summary.csv)")
+
     run = subparsers.add_parser("run")
     run.add_argument("-n", "--number-of-executions", default=1, type=int)
     run.add_argument("-a", "--accumulate", action="store_true", help="Run each preprocessor repeated 1..n times (accumulate)")
@@ -176,6 +180,24 @@ if __name__ == "__main__":
     if args.command == "preprocessors":
         print("The following preprocessors are registered:")
         print("\n".join(names_of_subclasses(ExecutablePreprocessor)))
+
+    if args.command == "summarize":
+        input_file = args.input
+        
+        if not os.path.isfile(input_file):
+            print(f"Error: Input file '{input_file}' not found")
+            exit(1)
+        
+        # Determine output file name
+        if args.output:
+            output_file = args.output
+        else:
+            # Generate default output name: output.csv -> output_summary.csv
+            base_name = os.path.splitext(input_file)[0]
+            output_file = f"{base_name}_summary.csv"
+        
+        summarizer = Summarizer(summary_csv_file=output_file)
+        summarizer.summarize(input_file)
 
     if args.command == "run":
 
