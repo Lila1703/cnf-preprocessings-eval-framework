@@ -505,7 +505,7 @@ class D4SharpEquiv(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
-    command_line = "./preprocessors/d4v2_preproc -i {source} -p sharpEquiv --target {target} --preproc-only 1"
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p sharp-equiv --target {target} --preproc-only 1"
     name = "D4SharpEquiv"
 
     def get_factor_of_number_of_solutions(self, output):
@@ -520,6 +520,18 @@ class D4Equiv(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
+    
+class XOR(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun --extend 0 --synthbve 0 --sbva 0 --probe 0 --bvepresimp 0 --simp 0 --intree 0 --extendccnr 0 --autarkies 0 --gates 0 --orgate 0 --irreggate 0 --itegate 1 --xorgate 0 --bce 0 --red 0   {source}  {target}"
+    name = "XOR"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+
 
 
 class PreprocessorSequence(Preprocessor):
