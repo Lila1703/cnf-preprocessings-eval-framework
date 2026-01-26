@@ -38,12 +38,15 @@ class ExecutableSolver:
                 stdout=subprocess.PIPE,
                 stderr=STDOUT,
                 timeout=timeout,
-                universal_newlines=True,
                 preexec_fn=_set_limits,
             )
             if result.returncode != 0:
                 return None
-            output = result.stdout
+            # Decode bytes with error handling for non-UTF-8 output
+            if isinstance(result.stdout, bytes):
+                output = result.stdout.decode('utf-8', errors='replace')
+            else:
+                output = result.stdout
         except CalledProcessError as e:
             output = e.output if isinstance(e.output, str) else str(e.output)
         except TimeoutExpired as e:
