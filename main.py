@@ -1,4 +1,4 @@
-from argparse import ArgumentParser, BooleanOptionalAction
+from argparse import ArgumentParser
 from os.path import isfile
 
 from progress.bar import Bar
@@ -156,8 +156,8 @@ if __name__ == "__main__":
     run.add_argument("-d", "--dimacs", nargs="+", required=True)
     run.add_argument("-o", "--output")
     run.add_argument("-sum", "--summary", help="Path to output summary CSV file (default: summary.csv)", nargs="?", const="summary.csv")
-    run.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
-    run.add_argument("-c", "--copy_comments", action=BooleanOptionalAction)
+    run.add_argument("-k", "--keep_dimacs", action="store_true", dest="keep_dimacs")
+    run.add_argument("-c", "--copy_comments", action="store_true", dest="copy_comments")
     run.add_argument("--nonopreprocessor", action="store_true", help="Disable automatic execution of NoPreprocessor baseline")
 
     check = subparsers.add_parser("check")
@@ -169,8 +169,8 @@ if __name__ == "__main__":
     check.add_argument("--counter", default="d4", help="Name of counting solver class to use (e.g. D4V2, SharpSat)")
     check.add_argument("-o", "--output")
     check.add_argument("-sum", "--summary", help="Path to output summary CSV file (default: equivalence_summary.csv)", nargs="?", const="equivalence_summary.csv")
-    check.add_argument("-k", "--keep_dimacs", action=BooleanOptionalAction)
-    check.add_argument("-c", "--copy_comments", action=BooleanOptionalAction)
+    check.add_argument("-k", "--keep_dimacs", action="store_true", dest="keep_dimacs")
+    check.add_argument("-c", "--copy_comments", action="store_true", dest="copy_comments")
 
     args = main.parse_args()
     if args.command == "solvers":

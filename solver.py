@@ -38,7 +38,7 @@ class ExecutableSolver:
                 stdout=subprocess.PIPE,
                 stderr=STDOUT,
                 timeout=timeout,
-                text=True,
+                universal_newlines=True,
                 preexec_fn=_set_limits,
             )
             if result.returncode != 0:
