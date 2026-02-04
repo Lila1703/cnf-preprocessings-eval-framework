@@ -76,18 +76,34 @@ class Benchmarker:
                                     pass
 
                         solver_start_time = time()
-                        # Use the preprocessed file if it exists, otherwise fall back to original DIMACS.
-                        solver_input_path = target_path if path.isfile(target_path) else dimacs
-                        number_of_solutions_raw = solver.run(
-                            solver_input_path,
-                            self.timeout - preprocessor_time
-                            if self.timeout is not None
-                            else None,
-                            mem_limit_mb=self.mem_limit_mb,
-                        )
-                        number_of_solutions = int(int(number_of_solutions_raw) * preprocessing_factor) if number_of_solutions_raw is not None and preprocessing_factor is not None else None
+                        # Use the preprocessed file if it exists, otherwise use an empty file
+                        empty_file_path = None
+                        if path.isfile(target_path):
+                            solver_input_path = target_path
+                        else:
+                            # Create an empty file to indicate preprocessing failure
+                            from uuid import uuid4
+                            empty_file_path = get_temp_dimacs_path(dimacs, preprocessor.name + "_empty_" + uuid4().hex, self.keep_dimacs)
+                            open(empty_file_path, 'w').close()
+                            solver_input_path = empty_file_path
+                        
+                        try:
+                            number_of_solutions_raw = solver.run(
+                                solver_input_path,
+                                self.timeout - preprocessor_time
+                                if self.timeout is not None
+                                else None,
+                                mem_limit_mb=self.mem_limit_mb,
+                            )
+                            number_of_solutions = int(int(number_of_solutions_raw) * preprocessing_factor) if number_of_solutions_raw is not None and preprocessing_factor is not None else None
+                        finally:
+                            # Clean up empty file after solver finishes, but keep target_path
+                            if empty_file_path and path.isfile(empty_file_path):
+                                remove(empty_file_path)
+                        
                         solver_time = time() - solver_start_time
-
+                        
+                        # Clean up preprocessed file after this solver is done
                         if not self.keep_dimacs and path.isfile(target_path):
                             remove(target_path)
 
