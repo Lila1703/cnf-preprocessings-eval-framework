@@ -1,4 +1,4 @@
-from subprocess import check_output, STDOUT, CalledProcessError, TimeoutExpired
+from subprocess import check_output, STDOUT, DEVNULL, CalledProcessError, TimeoutExpired
 from re import search
 from shlex import split
 from fractions import Fraction
@@ -29,8 +29,11 @@ class ExecutablePreprocessor(Preprocessor):
 
     def run(self, source, target, timeout=None):
         try:
+            # Ensure target file exists and is empty
+            open(target, 'w').close()
+            
             command = split(self.command_line.format(source=source, target=target))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
         except CalledProcessError as e:
             output = e.output
         except TimeoutExpired:
@@ -487,21 +490,58 @@ class Arjun(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
+
+# Helper function for PMC preprocessors
+def _filter_pmc_output(output_str):
+    """Filter PMC output to keep only valid DIMACS lines.
+
+    - Keeps comments and headers
+    - Extracts leading numeric parts from clause lines
+    - Appends missing trailing 0
+    """
+    lines = output_str.split('\n')
+    dimacs_lines = []
+    for line in lines:
+        if not line:
+            continue
+        # Keep comments (c ...) and header (p cnf ...)
+        if line.startswith('c') or line.startswith('p'):
+            dimacs_lines.append(line + '\n')
+            continue
+        # Keep clause lines - extract leading numbers and ensure they end with 0
+        parts = line.split()
+        if not parts:
+            continue
+
+        numeric_parts = []
+        for part in parts:
+            if part.lstrip('-').isdigit():
+                numeric_parts.append(part)
+            else:
+                break
+
+        if not numeric_parts:
+            continue
+
+        if numeric_parts[-1] != '0':
+            numeric_parts.append('0')
+
+        dimacs_lines.append(' '.join(numeric_parts) + '\n')
+    return dimacs_lines
     
 # PMC Preprocessors
-
 class Vivification_pmc(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
+    """A preprocessor that applies vivification preprocessing.
     """
 
     command_line = "./preprocessors/pmc -vivification {source}"
     name = "Vivification_pmc"
 
     def run(self, source, target, timeout=None):
-        """Override run to manually filter and write DIMACS output to target file."""
+        """Override run to capture stdout and write to target file."""
         try:
-            command = split(self.command_line.format(source=source, target=target))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+            command = split(self.command_line.format(source=source))
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
             
             # Decode output
             if isinstance(output, bytes):
@@ -509,30 +549,19 @@ class Vivification_pmc(ExecutablePreprocessor):
             else:
                 output_str = output
             
-            # Filter only DIMACS lines (starting with 'c' or 'p', or clause lines with numbers/spaces)
-            lines = output_str.split('\n')
-            dimacs_lines = []
-            for line in lines:
-                # Keep comments (c ...) and header (p cnf ...)
-                if line.startswith('c') or line.startswith('p'):
-                    dimacs_lines.append(line + '\n')
-                # Keep clause lines (they contain only numbers, spaces, and newlines)
-                elif line.strip() and any(c.isdigit() for c in line):
-                    try:
-                        # Try to parse as clause
-                        parts = line.split()
-                        if all(part.lstrip('-').isdigit() for part in parts):
-                            dimacs_lines.append(line + '\n')
-                    except:
-                        pass
-            
-            # Write filtered DIMACS to target file
+            # Filter and write to target file
+            dimacs_lines = _filter_pmc_output(output_str)
             with open(target, 'w') as f:
                 f.writelines(dimacs_lines)
             
             return self.get_factor_of_number_of_solutions(output_str)
         except CalledProcessError as e:
             output = e.output
+            if output:
+                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
+                dimacs_lines = _filter_pmc_output(output_str)
+                with open(target, 'w') as f:
+                    f.writelines(dimacs_lines)
             return self.get_factor_of_number_of_solutions(str(output) if output else "")
         except TimeoutExpired:
             return None
@@ -544,48 +573,35 @@ class Vivification_pmc(ExecutablePreprocessor):
         return 1
     
 class Affine(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
+    """A preprocessor that applies affine preprocessing.
     """
 
     command_line = "./preprocessors/pmc -affine {source}"
     name = "Affine"
 
     def run(self, source, target, timeout=None):
-        """Override run to manually filter and write DIMACS output to target file."""
+        """Override run to capture stdout and write to target file."""
         try:
-            command = split(self.command_line.format(source=source, target=target))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+            command = split(self.command_line.format(source=source))
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
             
-            # Decode output
             if isinstance(output, bytes):
                 output_str = output.decode('utf-8', errors='replace')
             else:
                 output_str = output
             
-            # Filter only DIMACS lines (starting with 'c' or 'p', or clause lines with numbers/spaces)
-            lines = output_str.split('\n')
-            dimacs_lines = []
-            for line in lines:
-                # Keep comments (c ...) and header (p cnf ...)
-                if line.startswith('c') or line.startswith('p'):
-                    dimacs_lines.append(line + '\n')
-                # Keep clause lines (they contain only numbers, spaces, and newlines)
-                elif line.strip() and any(c.isdigit() for c in line):
-                    try:
-                        # Try to parse as clause
-                        parts = line.split()
-                        if all(part.lstrip('-').isdigit() for part in parts):
-                            dimacs_lines.append(line + '\n')
-                    except:
-                        pass
-            
-            # Write filtered DIMACS to target file
+            dimacs_lines = _filter_pmc_output(output_str)
             with open(target, 'w') as f:
                 f.writelines(dimacs_lines)
             
             return self.get_factor_of_number_of_solutions(output_str)
         except CalledProcessError as e:
             output = e.output
+            if output:
+                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
+                dimacs_lines = _filter_pmc_output(output_str)
+                with open(target, 'w') as f:
+                    f.writelines(dimacs_lines)
             return self.get_factor_of_number_of_solutions(str(output) if output else "")
         except TimeoutExpired:
             return None
@@ -597,48 +613,35 @@ class Affine(ExecutablePreprocessor):
         return 1
     
 class OrGate(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
+    """A preprocessor that applies OR gate detection.
     """
 
     command_line = "./preprocessors/pmc -orGate {source}"
     name = "OrGate"
 
     def run(self, source, target, timeout=None):
-        """Override run to manually filter and write DIMACS output to target file."""
+        """Override run to capture stdout and write to target file."""
         try:
-            command = split(self.command_line.format(source=source, target=target))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+            command = split(self.command_line.format(source=source))
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
             
-            # Decode output
             if isinstance(output, bytes):
                 output_str = output.decode('utf-8', errors='replace')
             else:
                 output_str = output
             
-            # Filter only DIMACS lines (starting with 'c' or 'p', or clause lines with numbers/spaces)
-            lines = output_str.split('\n')
-            dimacs_lines = []
-            for line in lines:
-                # Keep comments (c ...) and header (p cnf ...)
-                if line.startswith('c') or line.startswith('p'):
-                    dimacs_lines.append(line + '\n')
-                # Keep clause lines (they contain only numbers, spaces, and newlines)
-                elif line.strip() and any(c.isdigit() for c in line):
-                    try:
-                        # Try to parse as clause
-                        parts = line.split()
-                        if all(part.lstrip('-').isdigit() for part in parts):
-                            dimacs_lines.append(line + '\n')
-                    except:
-                        pass
-            
-            # Write filtered DIMACS to target file
+            dimacs_lines = _filter_pmc_output(output_str)
             with open(target, 'w') as f:
                 f.writelines(dimacs_lines)
             
             return self.get_factor_of_number_of_solutions(output_str)
         except CalledProcessError as e:
             output = e.output
+            if output:
+                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
+                dimacs_lines = _filter_pmc_output(output_str)
+                with open(target, 'w') as f:
+                    f.writelines(dimacs_lines)
             return self.get_factor_of_number_of_solutions(str(output) if output else "")
         except TimeoutExpired:
             return None
@@ -650,48 +653,35 @@ class OrGate(ExecutablePreprocessor):
         return 1
     
 class EquivalenceDetection(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
+    """A preprocessor that applies equivalence detection.
     """
 
     command_line = "./preprocessors/pmc -equiv {source}"
     name = "EquivalenceDetection"
 
     def run(self, source, target, timeout=None):
-        """Override run to manually filter and write DIMACS output to target file."""
+        """Override run to capture stdout and write to target file."""
         try:
-            command = split(self.command_line.format(source=source, target=target))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+            command = split(self.command_line.format(source=source))
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
             
-            # Decode output
             if isinstance(output, bytes):
                 output_str = output.decode('utf-8', errors='replace')
             else:
                 output_str = output
             
-            # Filter only DIMACS lines (starting with 'c' or 'p', or clause lines with numbers/spaces)
-            lines = output_str.split('\n')
-            dimacs_lines = []
-            for line in lines:
-                # Keep comments (c ...) and header (p cnf ...)
-                if line.startswith('c') or line.startswith('p'):
-                    dimacs_lines.append(line + '\n')
-                # Keep clause lines (they contain only numbers, spaces, and newlines)
-                elif line.strip() and any(c.isdigit() for c in line):
-                    try:
-                        # Try to parse as clause
-                        parts = line.split()
-                        if all(part.lstrip('-').isdigit() for part in parts):
-                            dimacs_lines.append(line + '\n')
-                    except:
-                        pass
-            
-            # Write filtered DIMACS to target file
+            dimacs_lines = _filter_pmc_output(output_str)
             with open(target, 'w') as f:
                 f.writelines(dimacs_lines)
             
             return self.get_factor_of_number_of_solutions(output_str)
         except CalledProcessError as e:
             output = e.output
+            if output:
+                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
+                dimacs_lines = _filter_pmc_output(output_str)
+                with open(target, 'w') as f:
+                    f.writelines(dimacs_lines)
             return self.get_factor_of_number_of_solutions(str(output) if output else "")
         except TimeoutExpired:
             return None
@@ -703,48 +693,35 @@ class EquivalenceDetection(ExecutablePreprocessor):
         return 1
     
 class Backbone_pmc(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
+    """A preprocessor that applies literal implication detection.
     """
 
     command_line = "./preprocessors/pmc -litImplied {source}"
     name = "Backbone_pmc"
 
     def run(self, source, target, timeout=None):
-        """Override run to manually filter and write DIMACS output to target file."""
+        """Override run to capture stdout and write to target file."""
         try:
-            command = split(self.command_line.format(source=source, target=target))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+            command = split(self.command_line.format(source=source))
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
             
-            # Decode output
             if isinstance(output, bytes):
                 output_str = output.decode('utf-8', errors='replace')
             else:
                 output_str = output
             
-            # Filter only DIMACS lines (starting with 'c' or 'p', or clause lines with numbers/spaces)
-            lines = output_str.split('\n')
-            dimacs_lines = []
-            for line in lines:
-                # Keep comments (c ...) and header (p cnf ...)
-                if line.startswith('c') or line.startswith('p'):
-                    dimacs_lines.append(line + '\n')
-                # Keep clause lines (they contain only numbers, spaces, and newlines)
-                elif line.strip() and any(c.isdigit() for c in line):
-                    try:
-                        # Try to parse as clause
-                        parts = line.split()
-                        if all(part.lstrip('-').isdigit() for part in parts):
-                            dimacs_lines.append(line + '\n')
-                    except:
-                        pass
-            
-            # Write filtered DIMACS to target file
+            dimacs_lines = _filter_pmc_output(output_str)
             with open(target, 'w') as f:
                 f.writelines(dimacs_lines)
             
             return self.get_factor_of_number_of_solutions(output_str)
         except CalledProcessError as e:
             output = e.output
+            if output:
+                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
+                dimacs_lines = _filter_pmc_output(output_str)
+                with open(target, 'w') as f:
+                    f.writelines(dimacs_lines)
             return self.get_factor_of_number_of_solutions(str(output) if output else "")
         except TimeoutExpired:
             return None
@@ -756,48 +733,35 @@ class Backbone_pmc(ExecutablePreprocessor):
         return 1
 
 class EliminateLit(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
+    """A preprocessor that applies literal elimination.
     """
 
     command_line = "./preprocessors/pmc -eliminateLit {source}"
     name = "EliminateLit"
 
     def run(self, source, target, timeout=None):
-        """Override run to manually filter and write DIMACS output to target file."""
+        """Override run to capture stdout and write to target file."""
         try:
-            command = split(self.command_line.format(source=source, target=target))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+            command = split(self.command_line.format(source=source))
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
             
-            # Decode output
             if isinstance(output, bytes):
                 output_str = output.decode('utf-8', errors='replace')
             else:
                 output_str = output
             
-            # Filter only DIMACS lines (starting with 'c' or 'p', or clause lines with numbers/spaces)
-            lines = output_str.split('\n')
-            dimacs_lines = []
-            for line in lines:
-                # Keep comments (c ...) and header (p cnf ...)
-                if line.startswith('c') or line.startswith('p'):
-                    dimacs_lines.append(line + '\n')
-                # Keep clause lines (they contain only numbers, spaces, and newlines)
-                elif line.strip() and any(c.isdigit() for c in line):
-                    try:
-                        # Try to parse as clause
-                        parts = line.split()
-                        if all(part.lstrip('-').isdigit() for part in parts):
-                            dimacs_lines.append(line + '\n')
-                    except:
-                        pass
-            
-            # Write filtered DIMACS to target file
+            dimacs_lines = _filter_pmc_output(output_str)
             with open(target, 'w') as f:
                 f.writelines(dimacs_lines)
             
             return self.get_factor_of_number_of_solutions(output_str)
         except CalledProcessError as e:
             output = e.output
+            if output:
+                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
+                dimacs_lines = _filter_pmc_output(output_str)
+                with open(target, 'w') as f:
+                    f.writelines(dimacs_lines)
             return self.get_factor_of_number_of_solutions(str(output) if output else "")
         except TimeoutExpired:
             return None
@@ -809,48 +773,35 @@ class EliminateLit(ExecutablePreprocessor):
         return 1
     
 class AddClause(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
+    """A preprocessor that applies clause addition.
     """
 
     command_line = "./preprocessors/pmc -addClause {source}"
     name = "AddClause"
 
     def run(self, source, target, timeout=None):
-        """Override run to manually filter and write DIMACS output to target file."""
+        """Override run to capture stdout and write to target file."""
         try:
-            command = split(self.command_line.format(source=source, target=target))
-            output = check_output(command, stderr=STDOUT, timeout=timeout)
+            command = split(self.command_line.format(source=source))
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
             
-            # Decode output
             if isinstance(output, bytes):
                 output_str = output.decode('utf-8', errors='replace')
             else:
                 output_str = output
             
-            # Filter only DIMACS lines (starting with 'c' or 'p', or clause lines with numbers/spaces)
-            lines = output_str.split('\n')
-            dimacs_lines = []
-            for line in lines:
-                # Keep comments (c ...) and header (p cnf ...)
-                if line.startswith('c') or line.startswith('p'):
-                    dimacs_lines.append(line + '\n')
-                # Keep clause lines (they contain only numbers, spaces, and newlines)
-                elif line.strip() and any(c.isdigit() for c in line):
-                    try:
-                        # Try to parse as clause
-                        parts = line.split()
-                        if all(part.lstrip('-').isdigit() for part in parts):
-                            dimacs_lines.append(line + '\n')
-                    except:
-                        pass
-            
-            # Write filtered DIMACS to target file
+            dimacs_lines = _filter_pmc_output(output_str)
             with open(target, 'w') as f:
                 f.writelines(dimacs_lines)
             
             return self.get_factor_of_number_of_solutions(output_str)
         except CalledProcessError as e:
             output = e.output
+            if output:
+                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
+                dimacs_lines = _filter_pmc_output(output_str)
+                with open(target, 'w') as f:
+                    f.writelines(dimacs_lines)
             return self.get_factor_of_number_of_solutions(str(output) if output else "")
         except TimeoutExpired:
             return None
@@ -861,49 +812,36 @@ class AddClause(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
-class OrGate(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
+class Rewrite(ExecutablePreprocessor):
+    """A preprocessor that applies formula rewriting.
     """
 
-    command_line = "./preprocessors/pmc -orGate {source}"
-    name = "OrGate"
+    command_line = "./preprocessors/pmc -rewrite {source}"
+    name = "Rewrite"
 
     def run(self, source, target, timeout=None):
-        """Override run to manually filter and write DIMACS output to target file."""
+        """Override run to capture stdout and write to target file."""
         try:
-            command = split(self.command_line.format(source=source, target=target))
+            command = split(self.command_line.format(source=source))
             output = check_output(command, stderr=STDOUT, timeout=timeout)
             
-            # Decode output
             if isinstance(output, bytes):
                 output_str = output.decode('utf-8', errors='replace')
             else:
                 output_str = output
             
-            # Filter only DIMACS lines (starting with 'c' or 'p', or clause lines with numbers/spaces)
-            lines = output_str.split('\n')
-            dimacs_lines = []
-            for line in lines:
-                # Keep comments (c ...) and header (p cnf ...)
-                if line.startswith('c') or line.startswith('p'):
-                    dimacs_lines.append(line + '\n')
-                # Keep clause lines (they contain only numbers, spaces, and newlines)
-                elif line.strip() and any(c.isdigit() for c in line):
-                    try:
-                        # Try to parse as clause
-                        parts = line.split()
-                        if all(part.lstrip('-').isdigit() for part in parts):
-                            dimacs_lines.append(line + '\n')
-                    except:
-                        pass
-            
-            # Write filtered DIMACS to target file
+            dimacs_lines = _filter_pmc_output(output_str)
             with open(target, 'w') as f:
                 f.writelines(dimacs_lines)
             
             return self.get_factor_of_number_of_solutions(output_str)
         except CalledProcessError as e:
             output = e.output
+            if output:
+                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
+                dimacs_lines = _filter_pmc_output(output_str)
+                with open(target, 'w') as f:
+                    f.writelines(dimacs_lines)
             return self.get_factor_of_number_of_solutions(str(output) if output else "")
         except TimeoutExpired:
             return None
