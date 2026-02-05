@@ -1,6 +1,10 @@
 from time import time
 from os import remove, path
+import sys
 from util import get_comments_string, preprend_content, get_temp_dimacs_path, fix_pcnf_header_to_original
+
+# Increase the limit for integer string conversion to handle very large solution counts
+sys.set_int_max_str_digits(0)  # 0 means unlimited (Python 3.11+)
 
 
 class Benchmarker:
