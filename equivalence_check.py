@@ -95,7 +95,6 @@ def run_sat_solver(solver_template, cnf_path, timeout=None):
         return None
 
     up = text.upper()
-    # Prefer UNSAT detection first
     if 'UNSAT' in up:
         return False
     if 'SAT' in up:

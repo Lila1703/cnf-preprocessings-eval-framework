@@ -37,6 +37,17 @@ class EquivalenceChecker:
         if self.progress_bar:
             self.progress_bar.max = len(self.preprocessors) * len(self.dimacs)
 
+        if self.writer:
+            self.writer.fieldnames = [
+                "dimacs",
+                "preprocessor_name",
+                "preprocessor_time",
+                "logically_equivalent",
+                "count_check_status",
+                "sat_check_status",
+            ]
+            self.writer.writeheader()
+
         results = []
 
         for dimacs in self.dimacs:
@@ -169,6 +180,8 @@ class EquivalenceChecker:
                         pass
 
                 results.append(entry)
+                if self.writer:
+                    self.writer.writerows([entry])
 
                 if self.progress_bar:
                     self.progress_bar.next()
@@ -181,15 +194,6 @@ class EquivalenceChecker:
             self.summarizer.run(results)
 
         if self.writer:
-            self.writer.fieldnames = [
-                "dimacs",
-                "preprocessor_name",
-                "preprocessor_time",
-                "logically_equivalent",
-                "count_check_status",
-                "sat_check_status",
-            ]
-            self.writer.writeheader()
-            self.writer.writerows(results)
+            self.writer.flush()
 
         return results

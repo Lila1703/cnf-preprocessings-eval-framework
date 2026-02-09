@@ -43,16 +43,33 @@ class Benchmarker:
                 * self.number_of_executions
             )
 
+        if self.writer:
+            self.writer.fieldnames = [
+                "dimacs",
+                "preprocessor_name",
+                "solver_name",
+                "preprocessor_time",
+                "solver_time",
+                "total_time",
+                "preprocessing_factor",
+                "number_of_solutions",
+                "solutions_preserved",
+            ]
+            self.writer.writeheader()
+
         results = []
 
         for _ in range(self.number_of_executions):
             for dimacs in self.dimacs:
-                # Collect results for this dimacs+execution locally so we can
-                # determine the original model counts from the NoPreprocessor run
-                # regardless of its position in the preprocessor list.
-                local_results = []
+                # Ensure NoPreprocessor runs first so we can stream results
+                # with solutions_preserved computed immediately.
+                no_pre = [p for p in self.preprocessors if p.name == "NoPreprocessor"]
+                others = [p for p in self.preprocessors if p.name != "NoPreprocessor"]
+                ordered_preprocessors = no_pre + others
 
-                for preprocessor in self.preprocessors:
+                original_counts = {}
+
+                for preprocessor in ordered_preprocessors:
                     for solver in self.solvers:
                         solver_name = solver.name
                         preprocessor_name = preprocessor.name
@@ -111,6 +128,20 @@ class Benchmarker:
                         if not self.keep_dimacs and path.isfile(target_path):
                             remove(target_path)
 
+                        if preprocessor_name == "NoPreprocessor" and number_of_solutions is not None:
+                            original_counts[solver_name] = number_of_solutions
+
+                        if preprocessor_name == "NoPreprocessor":
+                            solutions_preserved = (
+                                True if number_of_solutions is not None else None
+                            )
+                        elif original_counts.get(solver_name) is None or number_of_solutions is None:
+                            solutions_preserved = None
+                        else:
+                            solutions_preserved = (
+                                original_counts[solver_name] == number_of_solutions
+                            )
+
                         entry = {
                             "solver_name": solver_name,
                             "preprocessor_name": preprocessor_name,
@@ -121,31 +152,15 @@ class Benchmarker:
                             "preprocessing_factor": preprocessing_factor,
                             "number_of_solutions": number_of_solutions,
                             "finished": number_of_solutions is not None,
-                            # fill solutions_preserved later after we know NoPreprocessor
-                            "solutions_preserved": None,
+                            "solutions_preserved": solutions_preserved,
                         }
 
-                        local_results.append(entry)
+                        results.append(entry)
+                        if self.writer:
+                            self.writer.writerows([entry])
 
                         if self.progress_bar:
                             self.progress_bar.next()
-
-                # Determine original counts from NoPreprocessor runs in local_results
-                original_counts = {}
-                for r in local_results:
-                    if r["preprocessor_name"] == "NoPreprocessor":
-                        original_counts[r["solver_name"]
-                                        ] = r["number_of_solutions"]
-
-                # Update solutions_preserved for all local results
-                for r in local_results:
-                    orig = original_counts.get(r["solver_name"])
-                    if orig is None or r["number_of_solutions"] is None:
-                        r["solutions_preserved"] = None
-                    else:
-                        r["solutions_preserved"] = orig == r["number_of_solutions"]
-
-                results.extend(local_results)
 
         if self.progress_bar:
             self.progress_bar.finish()
@@ -155,16 +170,4 @@ class Benchmarker:
             self.summarizer.run(results)
 
         if self.writer:
-            self.writer.fieldnames = [
-                "dimacs",
-                "preprocessor_name",
-                "solver_name",
-                "preprocessor_time",
-                "solver_time",
-                "total_time",
-                "preprocessing_factor",
-                "number_of_solutions",
-                "solutions_preserved",
-            ]
-            self.writer.writeheader()
-            self.writer.writerows(results)
+            self.writer.flush()
