@@ -151,7 +151,7 @@ class BinaryResolution(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -addRed2 -dimacs={target} {source}"
-    name = "AddRedBinaryClauses"
+    name = "BinaryResolution"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -419,6 +419,16 @@ class Vivification(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
+    
+class Vivification2(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p vivification --target {target} --preproc-only 1 --preproc-reducer-iteration -1"
+    name = "Vivification2"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
 
 class D4Basic(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
@@ -440,6 +450,16 @@ class Backbone(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
+class Backbone2(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p backbone2 --target {target} --preproc-only 1 --preproc-reducer-iteration -1"
+    name = "Backbone2"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
 class OccurrenceElimination(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
@@ -450,12 +470,32 @@ class OccurrenceElimination(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
+class OccurrenceElimination2(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p occElimination2 --target {target} --preproc-only 1 --preproc-reducer-iteration -1"
+    name = "OccurrenceElimination2"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
 class Combinaison(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
     command_line = "./preprocessors/d4v2_preproc -i {source} -p combinaison --target {target} --preproc-only 1"
     name = "Combinaison"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class Combinaison2(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/d4v2_preproc -i {source} -p combinaison2 --target {target} --preproc-only 1 --preproc-reducer-iteration -1"
+    name = "Combinaison2"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
