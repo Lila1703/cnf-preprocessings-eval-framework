@@ -67,27 +67,27 @@ class NoPreprocessor(ExecutablePreprocessor):
         return 1
 
 
-class UnitPropagation(ExecutablePreprocessor):
+class UnitPropagation_cop(ExecutablePreprocessor):
     """A preprocessnor that applies unit propagation.
 
     For details about unit propagation see preprocessors.md.
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -up -dimacs={target} {source}"
-    name = "UnitPropagation"
+    name = "UnitPropagation_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
 
 
-class Subsumption(ExecutablePreprocessor):
+class Subsumption_cop(ExecutablePreprocessor):
     """A preprocessnor that applies subsumption.
 
     For details about subsumption see preprocessors.md.
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -subsimp -dimacs={target} {source}"
-    name = "Subsumption"
+    name = "Subsumption_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -100,7 +100,7 @@ class EquivalenceDetection_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -dimacs={target} {source}"
-    name = "EquivalentLiteralElimination"
+    name = "EquivalenceDetection_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         found = search("(\\d+) ee-lits", output)
@@ -108,40 +108,40 @@ class EquivalenceDetection_cop(ExecutablePreprocessor):
             return Fraction(1, 2 ** int(found.group(1)))
 
 
-class Probing(ExecutablePreprocessor):
+class Probing_cop(ExecutablePreprocessor):
     """A preprocessnor that applies probing.
 
     For details about probing see preprocessors.md.
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -probe -dimacs={target} {source}"
-    name = "Probing"
+    name = "Probing_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
 
-class Probing2(ExecutablePreprocessor):
+class Probing2_cop(ExecutablePreprocessor):
     """A preprocessnor that applies probing.
 
     For details about probing see preprocessors.md.
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -pr-probe -dimacs={target} {source}"
-    name = "Probing2"
+    name = "Probing2_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
 
 
-class HiddenTautologyElimination(ExecutablePreprocessor):
+class HiddenTautologyElimination_cop(ExecutablePreprocessor):
     """A preprocessnor that applies hidden tautology elimination.
 
     For details about hidden tautology elimination see preprocessors.md.
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -hte -dimacs={target} {source}"
-    name = "HiddenTautologyElimination"
+    name = "HiddenTautologyElimination_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -160,7 +160,7 @@ class SharpSatPreprocessor(ExecutablePreprocessor):
         return 1
 
 
-class BinaryResolution(ExecutablePreprocessor):
+class BinaryResolution_cop(ExecutablePreprocessor):
     """A preprocessnor that adds redundant binary clauses
 
     For details about binary resolution see preprocessors.md.
@@ -173,7 +173,7 @@ class BinaryResolution(ExecutablePreprocessor):
         return 1
 
 
-class HyperBinaryResolution(ExecutablePreprocessor):
+class HyperBinaryResolution_cop(ExecutablePreprocessor):
     """A preprocessnor that applies hyper binary resolution
 
     For details about hyper binary resolution see preprocessors.md.
@@ -186,43 +186,10 @@ class HyperBinaryResolution(ExecutablePreprocessor):
         return 1
 
 # Added by Linus
-class BoundedVariableElimination(ExecutablePreprocessor): 
-    """A preprocessnor that applies bounded variable elimination
-
-    For details about bounded variable elimination see preprocessors.md.
-    """
-
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bce -no-ee -no-probe -bve -dimacs={target} {source}"
-    name = "BoundedVariableElimination"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-    
-
-class BlockedClauseElimination(ExecutablePreprocessor):
-    """A preprocessor that applies blocked clause elimination (BCE).
-
-    For details about BCE see preprocessors.md.
-    """
-
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-ee -no-probe -bce -dimacs={target} {source}"
-    name = "BlockedClauseElimination"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
 
 
-class XorReasoning(ExecutablePreprocessor):
-    """A preprocessor that applies XOR reasoning.
 
-    For details about XOR reasoning see preprocessors.md.
-    """
 
-    command_line = "./preprocessors/coprocessor -xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
-    name = "XorReasoning"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
 
 
 class FourierMotzkin(ExecutablePreprocessor):
@@ -238,40 +205,14 @@ class FourierMotzkin(ExecutablePreprocessor):
         return 1
 
 
-class DensePreprocessor(ExecutablePreprocessor):
-    """A preprocessor that applies dense preprocessing.
+class BoundedVariableElimination(ExecutablePreprocessor): 
+    """A preprocessnor that applies bounded variable elimination
 
-    For details about dense preprocessing see preprocessors.md.
+    For details about bounded variable elimination see preprocessors.md.
     """
 
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
-    name = "DensePreprocessor"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
-class Simplification(ExecutablePreprocessor):
-    """A preprocessor that applies general simplification.
-
-    For details about simplification see preprocessors.md.
-    """
-
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
-    name = "Simplification"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
-class UnhidingPreprocessor(ExecutablePreprocessor):
-    """A preprocessor that applies unhiding.
-
-    For details about unhiding see preprocessors.md.
-    """
-
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
-    name = "UnhidingPreprocessor"
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bce -no-ee -no-probe -bve -dimacs={target} {source}"
+    name = "BoundedVariableElimination"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -394,26 +335,26 @@ class ModularityBasedPreprocessing(ExecutablePreprocessor):
         return 1
 
 
-class TestCoprocessor(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
-    """
+# class TestCoprocessor(ExecutablePreprocessor):
+#     """A preprocessor that applies all default coprocessor simplifications.
+#     """
 
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -dimacs={target} {source}"
-    name = "TestCoprocessor"
+#     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -dimacs={target} {source}"
+#     name = "TestCoprocessor"
 
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
 
 
-class CoprocessorOff(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
-    """
+# class CoprocessorOff(ExecutablePreprocessor):
+#     """A preprocessor that applies all default coprocessor simplifications.
+#     """
 
-    command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -no-enabled_cp3  -dimacs={target} {source}"
-    name = "CoprocessorOff"
+#     command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -no-ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -no-enabled_cp3  -dimacs={target} {source}"
+#     name = "CoprocessorOff"
 
-    def get_factor_of_number_of_solutions(self, output):
-        return 1   
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1   
 
 
 class Vivification_cop(ExecutablePreprocessor):
@@ -429,7 +370,7 @@ class Vivification_cop(ExecutablePreprocessor):
         return 1
 
 # D4v2 Preprocessors
-class Vivification(ExecutablePreprocessor):
+class Vivification_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -440,7 +381,7 @@ class Vivification(ExecutablePreprocessor):
         return 1
 
 
-class Vivification2(ExecutablePreprocessor):
+class Vivification_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -451,7 +392,7 @@ class Vivification2(ExecutablePreprocessor):
         return 1
 
 
-class D4Basic(ExecutablePreprocessor):
+class D4Basic_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -462,7 +403,7 @@ class D4Basic(ExecutablePreprocessor):
         return 1
 
    
-class Backbone(ExecutablePreprocessor):
+class Backbone_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -473,7 +414,7 @@ class Backbone(ExecutablePreprocessor):
         return 1
     
 
-class Backbone2(ExecutablePreprocessor):
+class Backbone2_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -484,7 +425,7 @@ class Backbone2(ExecutablePreprocessor):
         return 1
 
 
-class OccurrenceElimination(ExecutablePreprocessor):
+class OccurrenceElimination_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -495,7 +436,7 @@ class OccurrenceElimination(ExecutablePreprocessor):
         return 1
 
 
-class OccurrenceElimination2(ExecutablePreprocessor):
+class OccurrenceElimination2_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -506,7 +447,7 @@ class OccurrenceElimination2(ExecutablePreprocessor):
         return 1
 
 
-class Combinaison(ExecutablePreprocessor):
+class Combinaison_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -517,7 +458,7 @@ class Combinaison(ExecutablePreprocessor):
         return 1
     
 
-class Combinaison2(ExecutablePreprocessor):
+class Combinaison2_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -528,7 +469,7 @@ class Combinaison2(ExecutablePreprocessor):
         return 1
     
 
-class D4SharpEquiv(ExecutablePreprocessor):
+class D4SharpEquiv_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -539,7 +480,7 @@ class D4SharpEquiv(ExecutablePreprocessor):
         return 1
     
 
-class D4Equiv(ExecutablePreprocessor):
+class D4Equiv_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -641,7 +582,8 @@ class Vivification_pmc(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
-    
+
+
 class Vivification_pmc2(ExecutablePreprocessor):
     """A preprocessor that applies vivification preprocessing.
     """
@@ -685,7 +627,7 @@ class Vivification_pmc2(ExecutablePreprocessor):
         return 1
 
 
-class Affine(ExecutablePreprocessor):
+class Affine_pmc(ExecutablePreprocessor):
     """A preprocessor that applies affine preprocessing.
     """
 
@@ -725,7 +667,8 @@ class Affine(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
 
-class Affine2(ExecutablePreprocessor):
+
+class Affine2_pmc(ExecutablePreprocessor):
     """A preprocessor that applies affine preprocessing.
     """
 
@@ -766,7 +709,7 @@ class Affine2(ExecutablePreprocessor):
         return 1
     
 
-class OrGate(ExecutablePreprocessor):
+class OrGate_pmc(ExecutablePreprocessor):
     """A preprocessor that applies OR gate detection.
     """
 
@@ -806,7 +749,8 @@ class OrGate(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
-class OrGate2(ExecutablePreprocessor):
+
+class OrGate2_pmc(ExecutablePreprocessor):
     """A preprocessor that applies OR gate detection.
     """
 
@@ -847,7 +791,7 @@ class OrGate2(ExecutablePreprocessor):
         return 1
     
 
-class EquivalenceDetection(ExecutablePreprocessor):
+class EquivalenceDetection_pmc(ExecutablePreprocessor):
     """A preprocessor that applies equivalence detection.
     """
 
@@ -887,7 +831,8 @@ class EquivalenceDetection(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
-class EquivalenceDetection2(ExecutablePreprocessor):
+
+class EquivalenceDetection2_pmc(ExecutablePreprocessor):
     """A preprocessor that applies equivalence detection.
     """
 
@@ -1010,7 +955,7 @@ class Backbone_pmc2(ExecutablePreprocessor):
         return 1
 
 
-class EliminateLit(ExecutablePreprocessor):
+class LiteralElimination_pmc(ExecutablePreprocessor):
     """A preprocessor that applies literal elimination.
     """
 
@@ -1049,8 +994,9 @@ class EliminateLit(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
-    
-class EliminateLit2(ExecutablePreprocessor):
+
+
+class LiteralElimination2_pmc(ExecutablePreprocessor):
     """A preprocessor that applies literal elimination.
     """
 
@@ -1091,7 +1037,7 @@ class EliminateLit2(ExecutablePreprocessor):
         return 1
     
 
-class AddClause(ExecutablePreprocessor):
+class AddClause_pmc(ExecutablePreprocessor):
     """A preprocessor that applies clause addition.
     """
 
@@ -1130,8 +1076,9 @@ class AddClause(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
-    
-class AddClause2(ExecutablePreprocessor):
+
+
+class AddClause2_pmc(ExecutablePreprocessor):
     """A preprocessor that applies clause addition.
     """
 
@@ -1770,6 +1717,7 @@ class PreprocessorSequence(Preprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
 
+
 def _set_header_to_max_var(input_file, output_file, target_var_count=None):
     """Set the header to use target_var_count (or max var if not specified).
     This helps SharpSat process preprocessed files consistently.
@@ -1813,3 +1761,79 @@ def _set_header_to_max_var(input_file, output_file, target_var_count=None):
     except Exception:
         return False
          
+# More techniques (not equi-countable)
+# class BoundedVariableElimination(ExecutablePreprocessor): 
+#     """A preprocessnor that applies bounded variable elimination
+
+#     For details about bounded variable elimination see preprocessors.md.
+#     """
+
+#     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bce -no-ee -no-probe -bve -dimacs={target} {source}"
+#     name = "BoundedVariableElimination"
+
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
+    
+
+# class BlockedClauseElimination(ExecutablePreprocessor):
+#     """A preprocessor that applies blocked clause elimination (BCE).
+
+#     For details about BCE see preprocessors.md.
+#     """
+
+#     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-ee -no-probe -bce -dimacs={target} {source}"
+#     name = "BlockedClauseElimination"
+
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
+
+
+# class XorReasoning(ExecutablePreprocessor):
+#     """A preprocessor that applies XOR reasoning.
+
+#     For details about XOR reasoning see preprocessors.md.
+#     """
+
+#     command_line = "./preprocessors/coprocessor -xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+#     name = "XorReasoning"
+
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
+    
+# class DensePreprocessor(ExecutablePreprocessor):
+#     """A preprocessor that applies dense preprocessing.
+
+#     For details about dense preprocessing see preprocessors.md.
+#     """
+
+#     command_line = "./preprocessors/coprocessor -no-xor -no-fm -dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+#     name = "DensePreprocessor"
+
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
+
+
+# class Simplification(ExecutablePreprocessor):
+#     """A preprocessor that applies general simplification.
+
+#     For details about simplification see preprocessors.md.
+#     """
+
+#     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+#     name = "Simplification"
+
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
+
+
+# class UnhidingPreprocessor(ExecutablePreprocessor):
+#     """A preprocessor that applies unhiding.
+
+#     For details about unhiding see preprocessors.md.
+#     """
+
+#     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+#     name = "UnhidingPreprocessor"
+
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
