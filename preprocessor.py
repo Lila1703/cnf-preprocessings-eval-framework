@@ -107,6 +107,7 @@ class EquivalenceDetection_cop(ExecutablePreprocessor):
         if found:
             return Fraction(1, 2 ** int(found.group(1)))
 
+
 class Probing(ExecutablePreprocessor):
     """A preprocessnor that applies probing.
 
@@ -1170,6 +1171,499 @@ class AddClause2(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
+# MaxSAT Preprocessor techniques
+class BlockedClauseElimination_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[b] -problemtype=sat -outputformat=original > {target}"
+    name = "BlockedClauseElimination_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+    
+class UnitPropagation_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[u] -problemtype=sat -outputformat=original > {target}"
+    name = "UnitPropagation_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class BoundedVariableElimination_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[v] -problemtype=sat -outputformat=original > {target}"
+    name = "BoundedVariableElimination_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class Subsumption_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[s] -problemtype=sat -outputformat=original > {target}"
+    name = "Subsumption_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class SelfSubsumingResolution_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[r] -problemtype=sat -outputformat=original > {target}"
+    name = "SelfSubsumingResolution_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class SubsumedLabelElimination_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[l] -problemtype=sat -outputformat=original > {target}"
+    name = "SubsumedLabelElimination_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class BinaryCoreRemoval_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[c] -problemtype=sat -outputformat=original > {target}"
+    name = "BinaryCoreRemoval_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class BoundedVariableAddition_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[a] -problemtype=sat -outputformat=original > {target}"
+    name = "BoundedVariableAddition_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class GeneralizedSubsumedLabelElimination_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[g] -problemtype=sat -outputformat=original > {target}"
+    name = "GeneralizedSubsumedLabelElimination_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class EquivalenceElimination_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[e] -problemtype=sat -outputformat=original > {target}"
+    name = "EquivalenceElimination_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class Unhiding_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[h] -problemtype=sat -outputformat=original > {target}"
+    name = "Unhiding_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class StructureLabeling_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[s] -problemtype=sat -outputformat=original > {target}"
+    name = "Subsumption_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class FailedliteralProbing_maxpre(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/maxpre {source} preprocess -techniques=[s] -problemtype=sat -outputformat=original > {target}"
+    name = "FailedliteralProbing_maxpre"
+
+    def run(self, source, target, timeout=None):
+        """Override run to capture stdout and write to target file."""
+        try:
+            command = split(
+                self.command_line.replace("> {target}", "").format(source=source, target=target)
+            )
+            output = check_output(command, stderr=DEVNULL, timeout=timeout)
+
+            output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+            with open(target, "w") as f:
+                f.write(output_str)
+
+            return self.get_factor_of_number_of_solutions(output_str)
+        except CalledProcessError as e:
+            output = e.output
+            if output:
+                output_str = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else output
+                with open(target, "w") as f:
+                    f.write(output_str)
+                return self.get_factor_of_number_of_solutions(output_str)
+            return self.get_factor_of_number_of_solutions("")
+        except TimeoutExpired:
+            return None
+        except OSError as e:
+            print(f"Preprocessor execution failed: {e}")
+            return None
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
 
 
 class PreprocessorSequence(Preprocessor):
