@@ -186,26 +186,7 @@ class HyperBinaryResolution_cop(ExecutablePreprocessor):
         return 1
 
 # Added by Linus
-
-
-
-
-
-
-class FourierMotzkin(ExecutablePreprocessor):
-    """A preprocessor that applies Fourier-Motzkin reasoning.
-
-    For details about Fourier-Motzkin reasoning see preprocessors.md.
-    """
-
-    command_line = "./preprocessors/coprocessor -no-xor -fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
-    name = "FourierMotzkin"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
-class BoundedVariableElimination(ExecutablePreprocessor): 
+class BoundedVariableElimination_cop(ExecutablePreprocessor): 
     """A preprocessnor that applies bounded variable elimination
 
     For details about bounded variable elimination see preprocessors.md.
@@ -218,7 +199,7 @@ class BoundedVariableElimination(ExecutablePreprocessor):
         return 1
 
 
-class SymmetryDetection(ExecutablePreprocessor):
+class SymmetryDetection_cop(ExecutablePreprocessor):
     """A preprocessor that applies symmetry detection and breaking.
 
     For details about symmetry detection see preprocessors.md.
@@ -231,7 +212,7 @@ class SymmetryDetection(ExecutablePreprocessor):
         return 1
 
 
-class BoundedVariableAddition(ExecutablePreprocessor):
+class BoundedVariableAddition_cop(ExecutablePreprocessor):
     """A preprocessor that applies bounded variable addition (BVA).
 
     For details about BVA see preprocessors.md.
@@ -244,7 +225,7 @@ class BoundedVariableAddition(ExecutablePreprocessor):
         return 1
     
 
-class CoveredClauseElimination(ExecutablePreprocessor):
+class CoveredClauseElimination_cop(ExecutablePreprocessor):
     """A preprocessor that applies covered clause elimination (CCE).
 
 
@@ -257,7 +238,7 @@ class CoveredClauseElimination(ExecutablePreprocessor):
         return 1
 
 
-class TernaryClauseResolution(ExecutablePreprocessor):
+class TernaryClauseResolution_cop(ExecutablePreprocessor):
     """A preprocessor that applies ternary clause resolution.
 
     For details about ternary clause resolution see preprocessors.md.
@@ -270,7 +251,7 @@ class TernaryClauseResolution(ExecutablePreprocessor):
         return 1
 
 
-class ResolutionAsymmetricTautologyElimination(ExecutablePreprocessor):
+class ResolutionAsymmetricTautologyElimination_cop(ExecutablePreprocessor):
     """A preprocessor that applies resolution asymmetric tautology elimination (RATE).
 
     For details about RATE see preprocessors.md.
@@ -283,7 +264,7 @@ class ResolutionAsymmetricTautologyElimination(ExecutablePreprocessor):
         return 1
 
 
-class LiteralAddition(ExecutablePreprocessor):
+class LiteralAddition_cop(ExecutablePreprocessor):
     """A preprocessor that applies literal addition (LA).
 
     For details about literal addition see preprocessors.md.
@@ -296,20 +277,7 @@ class LiteralAddition(ExecutablePreprocessor):
         return 1
 
 
-class ExperimentalSimplification(ExecutablePreprocessor):
-    """A preprocessor that applies experimental simplification techniques.
-
-    For details about experimental simplification see preprocessors.md.
-    """
-
-    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -exp -dimacs={target} {source}"
-    name = "ExperimentalSimplification"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
-class EntailedRedundancyCheck(ExecutablePreprocessor):
+class EntailedRedundancyCheck_cop(ExecutablePreprocessor):
     """A preprocessor that checks for entailed redundancy during preprocessing.
 
     For details about entailed redundancy checking see preprocessors.md.
@@ -322,7 +290,7 @@ class EntailedRedundancyCheck(ExecutablePreprocessor):
         return 1
 
 
-class ModularityBasedPreprocessing(ExecutablePreprocessor):
+class ModularityBasedPreprocessing_cop(ExecutablePreprocessor):
     """A preprocessor that applies modularity-based preprocessing.
 
     For details about modularity-based preprocessing see preprocessors.md.
@@ -381,7 +349,7 @@ class Vivification_d4(ExecutablePreprocessor):
         return 1
 
 
-class Vivification_d4(ExecutablePreprocessor):
+class Vivification2_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
@@ -1834,6 +1802,31 @@ def _set_header_to_max_var(input_file, output_file, target_var_count=None):
 
 #     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
 #     name = "UnhidingPreprocessor"
+
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
+
+
+# class FourierMotzkin(ExecutablePreprocessor):
+#     """A preprocessor that applies Fourier-Motzkin reasoning.
+
+#     For details about Fourier-Motzkin reasoning see preprocessors.md.
+#     """
+
+#     command_line = "./preprocessors/coprocessor -no-xor -fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+#     name = "FourierMotzkin"
+
+#     def get_factor_of_number_of_solutions(self, output):
+#         return 1
+
+# class ExperimentalSimplification_cop(ExecutablePreprocessor):
+#     """A preprocessor that applies experimental simplification techniques.
+
+#     For details about experimental simplification see preprocessors.md.
+#     """
+
+#     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -exp -dimacs={target} {source}"
+#     name = "ExperimentalSimplification"
 
 #     def get_factor_of_number_of_solutions(self, output):
 #         return 1
