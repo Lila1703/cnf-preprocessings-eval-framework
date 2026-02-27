@@ -88,9 +88,10 @@ class Benchmarker:
                         if path.isfile(target_path):
                             preprend_content(dimacs_comments, target_path)
                             # Ensure the p cnf header uses the original variable count
-                            # NOTE: Do NOT call this for SharpSatPreprocessor (or sequences containing it)
-                            # as it eliminates unused variables and the header must reflect the actual var count
-                            if "SharpSatPreprocessor" not in preprocessor_name:
+                            # NOTE: Do NOT call this for these preprocessors as they eliminate
+                            # unused variables and the header must reflect the actual var count
+                            excluded_from_header_fix = ["SharpSatPreprocessor", "OrGate_arjun", "IrregularGateRemoval_arjun", "ITEGateDetection_arjun", "XorGateDetection_arjun", "SBVA_arjun", "BCE_arjun", "RevBCE_arjun", "Distill_arjun", "Probe_arjun", "BVEPresimplify_arjun", "Simplification_arjun", "PreBackbone_arjun", "Autarkies_arjun", "GaussianJordan_arjun", "OracleSparsify_arjun", "OracleVivification_arjun", "OracleVivificationGetL_arjun", "Iteration1_arjun", "Iteration2_arjun"]
+                            if not any(excluded in preprocessor_name for excluded in excluded_from_header_fix):
                                 try:
                                     fix_pcnf_header_to_original(dimacs, target_path)
                                 except Exception:

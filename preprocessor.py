@@ -14,6 +14,7 @@ class Preprocessor:
         or `None` if this factor cannot be determined."""
         ...
 
+
 class ExecutablePreprocessor(Preprocessor):
     """Base class for all executable preprocessors.
 
@@ -349,17 +350,6 @@ class Vivification_d4(ExecutablePreprocessor):
         return 1
 
 
-class Vivification2_d4(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
-    """
-
-    command_line = "./preprocessors/d4v2_preproc -i {source} -p vivification --target {target} --preproc-only 1 --preproc-reducer-iteration -1"
-    name = "Vivification2"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
 class D4Basic_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
@@ -382,17 +372,6 @@ class Backbone_d4(ExecutablePreprocessor):
         return 1
     
 
-class Backbone2_d4(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
-    """
-
-    command_line = "./preprocessors/d4v2_preproc -i {source} -p backbone --target {target} --preproc-only 1 --preproc-reducer-iteration -1"
-    name = "Backbone2"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
 class OccurrenceElimination_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
@@ -403,28 +382,6 @@ class OccurrenceElimination_d4(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
 
-
-class OccurrenceElimination2_d4(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
-    """
-
-    command_line = "./preprocessors/d4v2_preproc -i {source} -p occElimination --target {target} --preproc-only 1 --preproc-reducer-iteration -1"
-    name = "OccurrenceElimination2"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
-class Combinaison_d4(ExecutablePreprocessor):
-    """A preprocessor that applies all default coprocessor simplifications.
-    """
-
-    command_line = "./preprocessors/d4v2_preproc -i {source} -p combinaison --target {target} --preproc-only 1"
-    name = "Combinaison"
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-    
 
 class Combinaison2_d4(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
@@ -459,16 +416,196 @@ class D4Equiv_d4(ExecutablePreprocessor):
         return 1
     
 # Arjun Preprocessors
-class Arjun(ExecutablePreprocessor):
+class OrGate_arjun(ExecutablePreprocessor):
     """A preprocessor that applies all default coprocessor simplifications.
     """
 
-    command_line = "./preprocessors/arjun --synthbve 0 --sbva 0 --samples 0 --probe 0 --bvepresimp 0 --simp 0 --intree 0 --gates 0 --orgate 0 --irreggate 0 --itegate 0 --xorgate 0 --sbvaclcut 0 --sbvalitcut 0 --findbins 0 --iter1 0 --iter1grow 0 --iter2 0 --iter2grow 0 --sbvabreak 0 --bveresolvmaxsz 0 --oraclesparsify 0 --oraclevivif 0 --oraclevivifgetl 0 --distill 0 --bce 0 --red 0 --renumber 0 --minimize 0  {source} {target}"
-    # "arjun --maxc 0 --extend 0 --synth 0 --unate 0 --synthbve 0 --revbce 0 --sbva 0 --prebackbone 0 --samples 0 --probe 0 --bvepresimp 0 --simp 0 --probe 0 --intree 0 --extendccnr 0 --autarkies 0 --gates 0 --nogatebelow 0 --orgate 0 --irreggate 0 --itegate 0 --xorgate 0 --appmc 0 --sbvaclcut 0 --sbvalitcut 0 --findbins 0 --sbvabreak 0 --gaussj 0 --iter1 0 --iter1grow 0 --iter2 0 --iter2grow 0 --bveresolvmaxsz 0 --oraclesparsify 0 --oraclevivif 0 --oraclevivifgetl 0 --distill 0 --bce 0 --red 0 --renumber 0 --specifiedorder 0 --minimize 0 --debugminim 0 --cmsmult 0 {input} {output}"
-    name = "Arjun"
+    command_line = "./preprocessors/arjun   --gates 1   --orgate 1   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "OrGate_arjun"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
+
+class IrregularGateRemoval_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 1   --orgate 0   --irreggate 1   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "IrregularGateRemoval_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class ITEGateDetection_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 1   --orgate 0   --irreggate 0   --itegate 1   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "ITEGateDetection_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class XorGateDetection_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 1   --orgate 0   --irreggate 0   --itegate 0   --xorgate 1   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "XorGateDetection_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+    
+class SBVA_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 1   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "SBVA_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class BCE_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 1   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "BCE_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class RevBCE_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 1   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "RevBCE_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class Distill_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 1   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "Distill_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class Probe_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 1   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "Probe_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class BVEPresimplify_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 1   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "BVEPresimplify_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class Simplification_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 1   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "Simplification_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class PreBackbone_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 1   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "PreBackbone_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class Autarkies_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 1   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "Autarkies_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class GaussianJordan_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 1   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "GaussianJordan_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class OracleSparsify_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 1   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "OracleSparsify_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class OracleVivification_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 1   --oraclevivifgetl 0   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "OracleVivification_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class OracleVivificationGetL_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 1   --iter1 0   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "OracleVivificationGetL_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class Iteration1_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 1   --iter2 0   --minimize 0 --renumber 0 {source} {target}"
+    name = "Iteration1_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+class Iteration2_arjun(ExecutablePreprocessor):
+    """A preprocessor that applies all default coprocessor simplifications.
+    """
+
+    command_line = "./preprocessors/arjun   --gates 0   --orgate 0   --irreggate 0   --itegate 0   --xorgate 0   --sbva 0   --bce 0   --revbce 0   --distill 0   --probe 0   --bvepresimp 0   --simp 0   --prebackbone 0   --autarkies 0   --gaussj 0   --oraclesparsify 0   --oraclevivif 0   --oraclevivifgetl 0   --iter1 0   --iter2 1   --minimize 0 --renumber 0 {source} {target}"
+    name = "Iteration2_arjun"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1    
+
 
 # Helper function for PMC preprocessors
 def _filter_pmc_output(output_str):
@@ -595,47 +732,6 @@ class Vivification_pmc2(ExecutablePreprocessor):
         return 1
 
 
-class Affine_pmc(ExecutablePreprocessor):
-    """A preprocessor that applies affine preprocessing.
-    """
-
-    command_line = "./preprocessors/pmc -affine {source}"
-    name = "Affine"
-
-    def run(self, source, target, timeout=None):
-        """Override run to capture stdout and write to target file."""
-        try:
-            command = split(self.command_line.format(source=source))
-            output = check_output(command, stderr=DEVNULL, timeout=timeout)
-            
-            if isinstance(output, bytes):
-                output_str = output.decode('utf-8', errors='replace')
-            else:
-                output_str = output
-            
-            dimacs_lines = _filter_pmc_output(output_str)
-            with open(target, 'w') as f:
-                f.writelines(dimacs_lines)
-            
-            return self.get_factor_of_number_of_solutions(output_str)
-        except CalledProcessError as e:
-            output = e.output
-            if output:
-                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
-                dimacs_lines = _filter_pmc_output(output_str)
-                with open(target, 'w') as f:
-                    f.writelines(dimacs_lines)
-            return self.get_factor_of_number_of_solutions(str(output) if output else "")
-        except TimeoutExpired:
-            return None
-        except OSError as e:
-            print(f"Preprocessor execution failed: {e}")
-            return None
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
 class Affine2_pmc(ExecutablePreprocessor):
     """A preprocessor that applies affine preprocessing.
     """
@@ -677,52 +773,11 @@ class Affine2_pmc(ExecutablePreprocessor):
         return 1
     
 
-class OrGate_pmc(ExecutablePreprocessor):
-    """A preprocessor that applies OR gate detection.
-    """
-
-    command_line = "./preprocessors/pmc -orGate {source}"
-    name = "OrGate"
-
-    def run(self, source, target, timeout=None):
-        """Override run to capture stdout and write to target file."""
-        try:
-            command = split(self.command_line.format(source=source))
-            output = check_output(command, stderr=DEVNULL, timeout=timeout)
-            
-            if isinstance(output, bytes):
-                output_str = output.decode('utf-8', errors='replace')
-            else:
-                output_str = output
-            
-            dimacs_lines = _filter_pmc_output(output_str)
-            with open(target, 'w') as f:
-                f.writelines(dimacs_lines)
-            
-            return self.get_factor_of_number_of_solutions(output_str)
-        except CalledProcessError as e:
-            output = e.output
-            if output:
-                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
-                dimacs_lines = _filter_pmc_output(output_str)
-                with open(target, 'w') as f:
-                    f.writelines(dimacs_lines)
-            return self.get_factor_of_number_of_solutions(str(output) if output else "")
-        except TimeoutExpired:
-            return None
-        except OSError as e:
-            print(f"Preprocessor execution failed: {e}")
-            return None
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-    
-
 class OrGate2_pmc(ExecutablePreprocessor):
     """A preprocessor that applies OR gate detection.
     """
 
-    command_line = "./preprocessors/pmc -orGate -iterate=50 {source}"
+    command_line = "./preprocessors/pmc -orGate -iterate=10 {source}"
     name = "OrGate2"
 
     def run(self, source, target, timeout=None):
@@ -798,48 +853,7 @@ class EquivalenceDetection_pmc(ExecutablePreprocessor):
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
-    
 
-class EquivalenceDetection2_pmc(ExecutablePreprocessor):
-    """A preprocessor that applies equivalence detection.
-    """
-
-    command_line = "./preprocessors/pmc -equiv -iterate=50 {source}"
-    name = "EquivalenceDetection2"
-
-    def run(self, source, target, timeout=None):
-        """Override run to capture stdout and write to target file."""
-        try:
-            command = split(self.command_line.format(source=source))
-            output = check_output(command, stderr=DEVNULL, timeout=timeout)
-            
-            if isinstance(output, bytes):
-                output_str = output.decode('utf-8', errors='replace')
-            else:
-                output_str = output
-            
-            dimacs_lines = _filter_pmc_output(output_str)
-            with open(target, 'w') as f:
-                f.writelines(dimacs_lines)
-            
-            return self.get_factor_of_number_of_solutions(output_str)
-        except CalledProcessError as e:
-            output = e.output
-            if output:
-                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
-                dimacs_lines = _filter_pmc_output(output_str)
-                with open(target, 'w') as f:
-                    f.writelines(dimacs_lines)
-            return self.get_factor_of_number_of_solutions(str(output) if output else "")
-        except TimeoutExpired:
-            return None
-        except OSError as e:
-            print(f"Preprocessor execution failed: {e}")
-            return None
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-    
 
 class Backbone_pmc(ExecutablePreprocessor):
     """A preprocessor that applies literal implication detection.
@@ -847,88 +861,6 @@ class Backbone_pmc(ExecutablePreprocessor):
 
     command_line = "./preprocessors/pmc -litImplied {source}"
     name = "Backbone_pmc"
-
-    def run(self, source, target, timeout=None):
-        """Override run to capture stdout and write to target file."""
-        try:
-            command = split(self.command_line.format(source=source))
-            output = check_output(command, stderr=DEVNULL, timeout=timeout)
-            
-            if isinstance(output, bytes):
-                output_str = output.decode('utf-8', errors='replace')
-            else:
-                output_str = output
-            
-            dimacs_lines = _filter_pmc_output(output_str)
-            with open(target, 'w') as f:
-                f.writelines(dimacs_lines)
-            
-            return self.get_factor_of_number_of_solutions(output_str)
-        except CalledProcessError as e:
-            output = e.output
-            if output:
-                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
-                dimacs_lines = _filter_pmc_output(output_str)
-                with open(target, 'w') as f:
-                    f.writelines(dimacs_lines)
-            return self.get_factor_of_number_of_solutions(str(output) if output else "")
-        except TimeoutExpired:
-            return None
-        except OSError as e:
-            print(f"Preprocessor execution failed: {e}")
-            return None
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
-class Backbone_pmc2(ExecutablePreprocessor):
-    """A preprocessor that applies literal implication detection.
-    """
-
-    command_line = "./preprocessors/pmc -litImplied -iterate=50 {source}"
-    name = "Backbone_pmc2"
-
-    def run(self, source, target, timeout=None):
-        """Override run to capture stdout and write to target file."""
-        try:
-            command = split(self.command_line.format(source=source))
-            output = check_output(command, stderr=DEVNULL, timeout=timeout)
-            
-            if isinstance(output, bytes):
-                output_str = output.decode('utf-8', errors='replace')
-            else:
-                output_str = output
-            
-            dimacs_lines = _filter_pmc_output(output_str)
-            with open(target, 'w') as f:
-                f.writelines(dimacs_lines)
-            
-            return self.get_factor_of_number_of_solutions(output_str)
-        except CalledProcessError as e:
-            output = e.output
-            if output:
-                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
-                dimacs_lines = _filter_pmc_output(output_str)
-                with open(target, 'w') as f:
-                    f.writelines(dimacs_lines)
-            return self.get_factor_of_number_of_solutions(str(output) if output else "")
-        except TimeoutExpired:
-            return None
-        except OSError as e:
-            print(f"Preprocessor execution failed: {e}")
-            return None
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
-
-class LiteralElimination_pmc(ExecutablePreprocessor):
-    """A preprocessor that applies literal elimination.
-    """
-
-    command_line = "./preprocessors/pmc -eliminateLit {source}"
-    name = "EliminateLit"
 
     def run(self, source, target, timeout=None):
         """Override run to capture stdout and write to target file."""
@@ -1004,47 +936,6 @@ class LiteralElimination2_pmc(ExecutablePreprocessor):
     def get_factor_of_number_of_solutions(self, output):
         return 1
     
-
-class AddClause_pmc(ExecutablePreprocessor):
-    """A preprocessor that applies clause addition.
-    """
-
-    command_line = "./preprocessors/pmc -addClause {source}"
-    name = "AddClause"
-
-    def run(self, source, target, timeout=None):
-        """Override run to capture stdout and write to target file."""
-        try:
-            command = split(self.command_line.format(source=source))
-            output = check_output(command, stderr=DEVNULL, timeout=timeout)
-            
-            if isinstance(output, bytes):
-                output_str = output.decode('utf-8', errors='replace')
-            else:
-                output_str = output
-            
-            dimacs_lines = _filter_pmc_output(output_str)
-            with open(target, 'w') as f:
-                f.writelines(dimacs_lines)
-            
-            return self.get_factor_of_number_of_solutions(output_str)
-        except CalledProcessError as e:
-            output = e.output
-            if output:
-                output_str = output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output
-                dimacs_lines = _filter_pmc_output(output_str)
-                with open(target, 'w') as f:
-                    f.writelines(dimacs_lines)
-            return self.get_factor_of_number_of_solutions(str(output) if output else "")
-        except TimeoutExpired:
-            return None
-        except OSError as e:
-            print(f"Preprocessor execution failed: {e}")
-            return None
-
-    def get_factor_of_number_of_solutions(self, output):
-        return 1
-
 
 class AddClause2_pmc(ExecutablePreprocessor):
     """A preprocessor that applies clause addition.
