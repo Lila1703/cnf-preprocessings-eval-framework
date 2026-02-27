@@ -77,8 +77,10 @@ class EquivalenceChecker:
                 # Run preprocessor
                 preprocessor_start_time = time()
                 factor = None
+                preprocessor_success = False
                 try:
                     factor = preprocessor.run(dimacs, target_path, self.timeout)
+                    preprocessor_success = True
                 except Exception:
                     pass
                 preprocessor_time = time() - preprocessor_start_time
@@ -97,6 +99,17 @@ class EquivalenceChecker:
                     "count_check_status": "UNKNOWN",
                     "sat_check_status": "UNKNOWN",
                 }
+
+                # If preprocessor failed, mark all checks as unknown
+                if not preprocessor_success:
+                    entry["count_check_status"] = "UNKNOWN"
+                    entry["sat_check_status"] = "UNKNOWN"
+                    results.append(entry)
+                    if self.writer:
+                        self.writer.writerows([entry])
+                    if self.progress_bar:
+                        self.progress_bar.next()
+                    continue
 
                 # Run count check
                 if self.counter_solver and path.isfile(target_path):
