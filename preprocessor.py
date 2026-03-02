@@ -94,14 +94,14 @@ class Subsumption_cop(ExecutablePreprocessor):
         return 1
 
 
-class EquivalenceDetection_cop(ExecutablePreprocessor):
+class EquivalentLiteralElimination(ExecutablePreprocessor):
     """A preprocessnor that applies equivalent literal elimination.
 
     For details about equivalent literal elimination see preprocessors.md.
     """
 
-    command_line = "./preprocessors/coprocessor -no-pre -no-xor -no-fm -no-simplify -no-dense -no-bve -ee -no-bce -no-unhide -no-receive -no-rer-f -no-rer-l -no-revMin -no-updLearnAct -no-refConflict -no-r-dyn-bl -no-useIP -no-usePP -no-randInp -no-cp3_limited -dimacs={target} {source}"
-    name = "EquivalenceDetection_cop"
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -ee -no-probe -dimacs={target} {source}"
+    name = "EquivalentLiteralElimination"
 
     def get_factor_of_number_of_solutions(self, output):
         found = search("(\\d+) ee-lits", output)
@@ -819,7 +819,7 @@ class EquivalenceDetection_pmc(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/pmc -equiv {source}"
-    name = "EquivalenceDetection"
+    name = "EquivalenceDetection_pmc"
 
     def run(self, source, target, timeout=None):
         """Override run to capture stdout and write to target file."""
