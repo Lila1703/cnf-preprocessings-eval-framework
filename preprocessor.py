@@ -168,7 +168,7 @@ class BinaryResolution_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -addRed2 -dimacs={target} {source}"
-    name = "BinaryResolution"
+    name = "BinaryResolution_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -181,7 +181,7 @@ class HyperBinaryResolution_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -hbr -dimacs={target} {source}"
-    name = "HyperBinaryResolution"
+    name = "HyperBinaryResolution_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -194,7 +194,7 @@ class BoundedVariableElimination_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bce -no-ee -no-probe -bve -dimacs={target} {source}"
-    name = "BoundedVariableElimination"
+    name = "BoundedVariableElimination_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -207,7 +207,7 @@ class SymmetryDetection_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -symm -dimacs={target} {source}"
-    name = "SymmetryDetection"
+    name = "SymmetryDetection_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -220,7 +220,7 @@ class BoundedVariableAddition_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -bva -dimacs={target} {source}"
-    name = "BoundedVariableAddition"
+    name = "BoundedVariableAddition_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -233,7 +233,7 @@ class CoveredClauseElimination_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -cce -dimacs={target} {source}"
-    name = "CoveredClauseElimination"
+    name = "CoveredClauseElimination_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -246,7 +246,7 @@ class TernaryClauseResolution_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -3resolve -dimacs={target} {source}"
-    name = "TernaryClauseResolution"
+    name = "TernaryClauseResolution_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -259,7 +259,7 @@ class ResolutionAsymmetricTautologyElimination_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -rate -dimacs={target} {source}"
-    name = "ResolutionAsymmetricTautologyElimination"
+    name = "ResolutionAsymmetricTautologyElimination_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -344,7 +344,7 @@ class Vivification_d4(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/d4v2_preproc -i {source} -p vivification --target {target} --preproc-only 1"
-    name = "Vivification"
+    name = "Vivification_d4"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -355,7 +355,7 @@ class D4Basic_d4(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/d4v2_preproc -i {source} -p basic --target {target} --preproc-only 1"
-    name = "D4Basic"
+    name = "D4Basic_d4"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -366,7 +366,7 @@ class Backbone_d4(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/d4v2_preproc -i {source} -p backbone --target {target} --preproc-only 1"
-    name = "Backbone"
+    name = "Backbone_d4"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -377,7 +377,7 @@ class OccurrenceElimination_d4(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/d4v2_preproc -i {source} -p occElimination --target {target} --preproc-only 1"
-    name = "OccurrenceElimination"
+    name = "OccurrenceElimination_d4"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -388,7 +388,7 @@ class Combinaison2_d4(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/d4v2_preproc -i {source} -p combinaison --target {target} --preproc-only 1 --preproc-reducer-iteration -1"
-    name = "Combinaison2"
+    name = "Combinaison2_d4"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -737,7 +737,7 @@ class Affine2_pmc(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/pmc -affine -iterate=50 {source}"
-    name = "Affine2"
+    name = "Affine2_pmc"
 
     def run(self, source, target, timeout=None):
         """Override run to capture stdout and write to target file."""
@@ -778,7 +778,7 @@ class OrGate2_pmc(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/pmc -orGate -iterate=10 {source}"
-    name = "OrGate2"
+    name = "OrGate2_pmc"
 
     def run(self, source, target, timeout=None):
         """Override run to capture stdout and write to target file."""
@@ -901,7 +901,7 @@ class LiteralElimination2_pmc(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/pmc -eliminateLit -iterate=50 {source}"
-    name = "EliminateLit2"
+    name = "LiteralElimination2_pmc"
 
     def run(self, source, target, timeout=None):
         """Override run to capture stdout and write to target file."""
