@@ -94,14 +94,14 @@ class Subsumption_cop(ExecutablePreprocessor):
         return 1
 
 
-class EquivalentLiteralElimination(ExecutablePreprocessor):
+class EquivalentLiteralElimination_cop(ExecutablePreprocessor):
     """A preprocessnor that applies equivalent literal elimination.
 
     For details about equivalent literal elimination see preprocessors.md.
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -ee -no-probe -dimacs={target} {source}"
-    name = "EquivalentLiteralElimination"
+    name = "EquivalentLiteralElimination_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         found = search("(\\d+) ee-lits", output)
@@ -239,6 +239,32 @@ class CoveredClauseElimination_cop(ExecutablePreprocessor):
         return 1
 
 
+class FourierMotzkin_cop(ExecutablePreprocessor):
+    """A preprocessor that applies Fourier-Motzkin reasoning.
+
+    For details about Fourier-Motzkin reasoning see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+    name = "FourierMotzkin_cop"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
+class Simplification_cop(ExecutablePreprocessor):
+    """A preprocessor that applies general simplification.
+
+    For details about simplification see preprocessors.md.
+    """
+
+    command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
+    name = "Simplification_cop"
+
+    def get_factor_of_number_of_solutions(self, output):
+        return 1
+
+
 class TernaryClauseResolution_cop(ExecutablePreprocessor):
     """A preprocessor that applies ternary clause resolution.
 
@@ -272,7 +298,7 @@ class LiteralAddition_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -la -dimacs={target} {source}"
-    name = "LiteralAddition"
+    name = "LiteralAddition_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1
@@ -1672,19 +1698,6 @@ def _set_header_to_max_var(input_file, output_file, target_var_count=None):
 #         return 1
 
 
-# class Simplification(ExecutablePreprocessor):
-#     """A preprocessor that applies general simplification.
-
-#     For details about simplification see preprocessors.md.
-#     """
-
-#     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
-#     name = "Simplification"
-
-#     def get_factor_of_number_of_solutions(self, output):
-#         return 1
-
-
 # class UnhidingPreprocessor(ExecutablePreprocessor):
 #     """A preprocessor that applies unhiding.
 
@@ -1697,18 +1710,6 @@ def _set_header_to_max_var(input_file, output_file, target_var_count=None):
 #     def get_factor_of_number_of_solutions(self, output):
 #         return 1
 
-
-# class FourierMotzkin(ExecutablePreprocessor):
-#     """A preprocessor that applies Fourier-Motzkin reasoning.
-
-#     For details about Fourier-Motzkin reasoning see preprocessors.md.
-#     """
-
-#     command_line = "./preprocessors/coprocessor -no-xor -fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -dimacs={target} {source}"
-#     name = "FourierMotzkin"
-
-#     def get_factor_of_number_of_solutions(self, output):
-#         return 1
 
 # class ExperimentalSimplification_cop(ExecutablePreprocessor):
 #     """A preprocessor that applies experimental simplification techniques.
