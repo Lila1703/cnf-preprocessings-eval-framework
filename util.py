@@ -21,7 +21,7 @@ def preprend_content(part_to_prepent, input_path):
 
 def get_temp_dimacs_path(original_dimacs, preprocessor_name, keep_dimacs = False):
     if not keep_dimacs:
-        return 'temp.dimacs'
+        return f'temp.{preprocessor_name}.dimacs'
     makedirs('preprocessed_dimacs', exist_ok=True)
     return path.join('preprocessed_dimacs', f'{preprocessor_name}-{path.basename(original_dimacs)}')
 

@@ -136,14 +136,28 @@ class EquivalenceChecker:
                                 entry["count_check_status"] = "FAIL"
                         else:
                             # Factor was returned, compute expected original count
-                            expected = Fraction(pre_count_int) * Fraction(factor)
-                            if expected.denominator == 1:
-                                if original_count_int == expected.numerator:
-                                    entry["count_check_status"] = "PASS"
+                            factor_fraction = None
+                            try:
+                                if isinstance(factor, Fraction):
+                                    factor_fraction = factor
+                                elif isinstance(factor, float):
+                                    factor_fraction = Fraction(str(factor))
+                                else:
+                                    factor_fraction = Fraction(factor)
+                            except (ValueError, TypeError, ZeroDivisionError):
+                                factor_fraction = None
+
+                            if factor_fraction is None:
+                                entry["count_check_status"] = "UNKNOWN"
+                            else:
+                                expected = Fraction(pre_count_int) * factor_fraction
+                                if expected.denominator == 1:
+                                    if original_count_int == expected.numerator:
+                                        entry["count_check_status"] = "PASS"
+                                    else:
+                                        entry["count_check_status"] = "FAIL"
                                 else:
                                     entry["count_check_status"] = "FAIL"
-                            else:
-                                entry["count_check_status"] = "FAIL"
                     except Exception:
                         entry["count_check_status"] = "ERROR"
                 else:
