@@ -324,7 +324,7 @@ class ModularityBasedPreprocessing_cop(ExecutablePreprocessor):
     """
 
     command_line = "./preprocessors/coprocessor -no-xor -no-fm -no-dense -no-simplify -no-unhide -no-bve -no-bce -no-ee -no-probe -modprep -dimacs={target} {source}"
-    name = "ModularityBasedPreprocessing"
+    name = "ModularityBasedPreprocessing_cop"
 
     def get_factor_of_number_of_solutions(self, output):
         return 1

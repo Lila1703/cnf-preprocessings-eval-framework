@@ -19,11 +19,12 @@ def preprend_content(part_to_prepent, input_path):
         file.write(part_to_prepent + original_content)
 
 
-def get_temp_dimacs_path(original_dimacs, preprocessor_name, keep_dimacs = False):
+def get_temp_dimacs_path(original_dimacs, _preprocessor_name, keep_dimacs = False):
+    # Keep temporary filenames stable and independent from preprocessor names.
     if not keep_dimacs:
-        return f'temp.{preprocessor_name}.dimacs'
+        return 'temp.dimacs'
     makedirs('preprocessed_dimacs', exist_ok=True)
-    return path.join('preprocessed_dimacs', f'{preprocessor_name}-{path.basename(original_dimacs)}')
+    return path.join('preprocessed_dimacs', path.basename(original_dimacs))
 
 
 def fix_pcnf_header_to_original(original_dimacs, target_dimacs):
