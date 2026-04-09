@@ -17,6 +17,7 @@ SharpSatWithoutBuiltinPreprocessor
 DSharp
 CountAntom
 D4
+D4V2
 BddMiniSat
 Ganak
 RelSat
@@ -28,44 +29,74 @@ C2D
 > python3 main.py preprocessors
 The following preprocessors are registered:
 NoPreprocessor
-UnitPropagation
-Subsumption
-    Subsumption2
-EquivalentLiteralElimination
-Probing
-HiddenTautologyElimination
+UnitPropagation_cop
+Subsumption_cop
+EquivalentLiteralElimination_cop
+Probing_cop
+Probing2_cop
+HiddenTautologyElimination_cop
 SharpSatPreprocessor
-BinaryResolution
-HyperBinaryResolution
-BoundedVariableElimination
-BlockedClauseElimination
-XorReasoning
-FourierMotzkin
-DensePreprocessor
-Simplification
-UnhidingPreprocessor
-SymmetryDetection
-BoundedVariableAddition
-CoveredClauseElimination
-ShufflePreprocessor
-TernaryClauseResolution
-ResolutionAsymmetricTautologyElimination
-LiteralAddition
-ExperimentalSimplification
-EntailedRedundancyCheck
-ModularityBasedPreprocessing
-    TestCoprocessor
-    CoprocessorOff
-    CoprocessorSequence
-    CoprocessorSequence2
-    DefaultCoprocessor
-Vivification
-D4Basic
-Backbone
-OccurrenceElimination
-Combinaison
-D4SharpEquiv
-D4Equiv
+BinaryResolution_cop
+HyperBinaryResolution_cop
+BoundedVariableElimination_cop
+SymmetryDetection_cop
+BoundedVariableAddition_cop
+CoveredClauseElimination_cop
+FourierMotzkin_cop
+Simplification_cop
+TernaryClauseResolution_cop
+ResolutionAsymmetricTautologyElimination_cop
+LiteralAddition_cop
+EntailedRedundancyCheck_cop
+ModularityBasedPreprocessing_cop
+Vivification_cop
+Vivification_d4
+D4Basic_d4
+Backbone_d4
+OccurrenceElimination_d4
+Combinaison2_d4
+D4SharpEquiv_d4
+D4Equiv_d4
+OrGate_arjun
+IrregularGateRemoval_arjun
+ITEGateDetection_arjun
+XorGateDetection_arjun
+SBVA_arjun
+BCE_arjun
+RevBCE_arjun
+Distill_arjun
+Probe_arjun
+BVEPresimplify_arjun
+Simplification_arjun
+PreBackbone_arjun
+Autarkies_arjun
+GaussianJordan_arjun
+OracleSparsify_arjun
+OracleVivification_arjun
+OracleVivificationGetL_arjun
+Iteration1_arjun
+Iteration2_arjun
+Vivification_pmc
+Vivification_pmc2
+Affine2_pmc
+OrGate2_pmc
+EquivalenceDetection_pmc
+Backbone_pmc
+LiteralElimination2_pmc
+AddClause2_pmc
+BlockedClauseElimination_maxpre
+UnitPropagation_maxpre
+BoundedVariableElimination_maxpre
+Subsumption_maxpre
+SelfSubsumingResolution_maxpre
+SubsumedLabelElimination_maxpre
+BinaryCoreRemoval_maxpre
+BoundedVariableAddition_maxpre
+GeneralizedSubsumedLabelElimination_maxpre
+EquivalenceElimination_maxpre
+Unhiding_maxpre
+StructureLabeling_maxpre
+FailedliteralProbing_maxpre
 ```
 
 ### Running benchmarks:
@@ -95,8 +126,12 @@ The following options are supported:
 - `-d`/`--dimacs` with a list of files in DIMACS CNT format
 - `-n`/`--number-of-executions` with the number of times the benchmark should be repeated (optional, default: 1)
 - `-o`/`--output` with the file where the full results should be written to (optional, default: full results are discarded)
+- `-sum`/`--summary` with the file where the summary should be written to (optional, default: `summary.csv` when provided without value)
 - `-t`/`--timeout` with the timeout (in seconds) after which a solver/preprocessor should be terminated (optional, default: no timeout)
 - `--mem-limit-mb` sets a per-process memory limit in megabytes for solver runs; if a solver exceeds the limit, it is terminated and the run is marked unfinished. Useful to prevent D4 (or others) from exhausting system RAM.
+- `-k`/`--keep_dimacs` keeps generated intermediate DIMACS files
+- `-c`/`--copy_comments` copies comments from original DIMACS into generated files
+- `--nonopreprocessor` disables automatic inclusion of `NoPreprocessor` as baseline
 
 The output on the command line will be a summary of the full results sorted by the average total time:
 
@@ -131,9 +166,9 @@ Examples:
 ./bin/python main.py check -p UnitPropagation -d test/mbx.dimacs
 ```
 
-- Run a counting-based check using the default counter (`SharpSat`):
+- Run a counting-based check using the configured counter (default: `d4`):
 ```
-./bin/python main.py check -p UnitPropagation -d test/mbx.dimacs --count-check
+./bin/python main.py check -p UnitPropagation -d test/mbx.dimacs --counter SharpSat
 ```
 
 
@@ -144,7 +179,24 @@ Meaning of outputs:
 
 Notes and flags:
 - `-p`/`--preprocessor` : name of the preprocessor (or a quoted sequence to create a pipeline). Must be provided for `check`.
-- `--count-check` : run a model-count comparison (uses the solver class named by `--counter`).
-- `--counter` : name of the counting solver to use (default: `SharpSat`). The name must match a solver class in `solver.py`.
+- `-d`/`--dimacs` : DIMACS files or directories to check.
+- `-S`/`--sat-solver` : SAT solver command template used for SAT-based checking (default: `./solvers/MiniSat_v1.14_linux {input}`).
+- `--counter` : name of the counting solver to use (default: `d4`). The name must match a solver class in `solver.py`.
+- `-o`/`--output` : write full check results to CSV.
+- `-sum`/`--summary` : write check summary CSV (default: `equivalence_summary.csv` when provided without value).
 - `-t`/`--timeout` : timeout in seconds for solver/preprocessor runs.
-- `--mem-limit-mb` : per-process memory cap (MB) applied to the counter solver when `--count-check` is used.
+- `--mem-limit-mb` : per-process memory cap (MB) applied to the counter solver.
+- `-k`/`--keep_dimacs` : keeps generated intermediate DIMACS files.
+- `-c`/`--copy_comments` : copies comments from original DIMACS into generated files.
+
+### Summarizing Existing Benchmark Output (`summarize`)
+
+Create a summary CSV from an existing benchmark result CSV:
+
+```
+python3 main.py summarize output.csv
+```
+
+Options:
+- `input` : path to input CSV file (required).
+- `-o`/`--output` : path to output summary CSV file (optional, default: `<input>_summary.csv`).

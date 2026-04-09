@@ -148,7 +148,6 @@ if __name__ == "__main__":
 
     run = subparsers.add_parser("run")
     run.add_argument("-n", "--number-of-executions", default=1, type=int)
-    run.add_argument("-a", "--accumulate", action="store_true", help="Run each preprocessor repeated 1..n times (accumulate)")
     run.add_argument("-p", "--preprocessor", nargs="+", default=[])
     run.add_argument("-t", "--timeout", type=float)
     run.add_argument("--mem-limit-mb", type=int, help="Per-process memory limit in MB (applies to solvers)")
